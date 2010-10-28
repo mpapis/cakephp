@@ -4772,6 +4772,70 @@ class ModelReadTest extends BaseModelTest {
 	}
 
 /**
+ * test that bindModel doesn't reuse association conditions for the find
+ *
+ * @return void
+ */
+	function testBindConditions() {
+		$this->loadFixtures('Bid', 'Message', 'Thread');
+		$Bid =& new Bid();
+		$Bid->recursive = 2;
+		$Bid->Message->unbindModel(array('hasOne' => array('Bid')), false);
+		$Bid->Message->bindModel(array('belongsTo' => array('Thread')), false);
+
+		$expectedMessage = array(
+			'Message' => array(
+				'id' => 1,
+				'thread_id' => 1,
+				'name' => 'Thread 1, Message 1',
+			),
+			'Thread' => array(
+				'id' => 1,
+				'project_id' => 1,
+				'name' => 'Project 1, Thread 1',
+			),
+		);
+		$expectedBid = array(
+			'Bid' => array(
+				'id' => 1,
+				'message_id' => 1,
+				'name' => 'Bid 1.1',
+			),
+			'Message' => array(
+				'id' => 1,
+				'thread_id' => 1,
+				'name' => 'Thread 1, Message 1',
+				'Thread' => array(
+					'id' => 1,
+					'project_id' => 1,
+					'name' => 'Project 1, Thread 1',
+				),
+			)
+		);
+
+		$result = $Bid->Message->find('first');
+		$this->assertEqual($result, $expectedMessage);
+
+		$result = $Bid->find('first');
+		$this->assertEqual($result, $expectedBid);
+
+		$Bid->Message->bindModel(array('belongsTo' => array(
+			'Thread' => array(
+				'className' => 'Thread',
+				'foreignKey' => 'thread_id',
+				'conditions' => array('Message.id' => 1)
+			)))
+			, false
+		);
+		$result = $Bid->Message->find('first');
+		$this->assertEqual($result, $expectedMessage);
+
+		$result = $Bid->find('first');
+		$this->assertEqual($result, $expectedBid);
+		$Bid->Message->resetAssociations();
+	}
+
+/**
  * test that bindModel behaves with Custom primary Key associations
  *
  * @return void
