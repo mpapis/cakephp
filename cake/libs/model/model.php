@@ -2157,8 +2157,8 @@ class Model extends Overloadable {
 			$query['limit'] = 1;
 			return $query;
 		} elseif ($state == 'after') {
-			if (empty($results[0])) {
-				return false;
+			if (empty($results)) {
+				return $results;
 			}
 			return $results[0];
 		}

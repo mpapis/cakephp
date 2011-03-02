@@ -7453,4 +7453,16 @@ class ModelReadTest extends BaseModelTest {
 		$this->assertEqual($Post->getVirtualField('other_field'), $Post->virtualFields['other_field']);
 		$this->assertEqual($Post->getVirtualField('Post.other_field'), $Post->virtualFields['other_field']);
 	}
+
+/**
+ * Test that find('first') returns empty array() when no rows are found.
+ *
+ * @return void
+ */
+	function testFindFirstEmpty() {
+		$this->loadFixtures('Article');
+		$Article =& new Article();
+		$result = $Article->find('first', array('conditions' => array('Article.title' => 'unknown')));
+		$this->assertEqual($result, array());
+	}
 }
