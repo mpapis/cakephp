@@ -480,7 +480,6 @@ class DboSource extends DataSource {
 				$params = null;
 			}
 			if (!$query->execute($params)) {
-				$this->_result = $query;
 				$this->error = $this->lastError($query);
 				$query->closeCursor();
 				return false;
@@ -491,7 +490,6 @@ class DboSource extends DataSource {
 			}
 			return $query;
 		} catch (PDOException $e) {
-			$this->_result = null;
 			$this->error = $e->getMessage();
 			return false;
 		}
