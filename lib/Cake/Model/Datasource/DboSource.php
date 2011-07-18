@@ -349,7 +349,11 @@ class DboSource extends DataSource {
 		if (empty($column)) {
 			$column = $this->introspectType($data);
 		}
-		$key = md5(implode('-', array_keys($this->_bindValues)));
+		$key = 0;
+		if ($this->_bindValues) {
+			$key = end(array_keys($this->_bindValues));
+		}
+		$key++;
 		switch ($column) {
 			case 'binary':
 				$this->_bindValues[$key] = array($data, PDO::PARAM_LOB);
@@ -480,8 +484,9 @@ class DboSource extends DataSource {
 			$query = $this->_connection->prepare($sql, $prepareOptions);
 			$query->setFetchMode(PDO::FETCH_LAZY);
 			foreach ($this->_bindValues as $key => $bind) {
-				if (strpos($sql, ':' . $key) !== false) {
+				if (strpos($sql, ":$key") !== false) {
 					$query->bindValue(":$key", $bind[0], $bind[1]);
+					unset($this->_bindValues[$key]);
 				}
 			}
 			if (empty($params)) {
