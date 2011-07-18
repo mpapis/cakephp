@@ -247,6 +247,14 @@ class DboSource extends DataSource {
 	public $fieldParameters = array();
 
 /**
+ * List of values to bind for quoting
+ *
+ * @var array
+ * @access public
+ */
+	protected $_bindValues = array();
+
+/**
  * Constructor
  *
  * @param array $config Array of configuration information for the Datasource.
@@ -333,17 +341,20 @@ class DboSource extends DataSource {
 		if (empty($column)) {
 			$column = $this->introspectType($data);
 		}
-
+		$key = md5(implode('-', array_keys($this->_bindValues)));
 		switch ($column) {
 			case 'binary':
-				return $this->_connection->quote($data, PDO::PARAM_LOB);
+				$this->_bindValues[$key] = array($data, PDO::PARAM_LOB);
+				return ":$key";
 			break;
 			case 'boolean':
-				return $this->_connection->quote($this->boolean($data, true), PDO::PARAM_BOOL);
+				$this->_bindValues[$key] = array($this->boolean($data, true), PDO::PARAM_BOOL);
+				return ":$key";
 			break;
 			case 'string':
 			case 'text':
-				return $this->_connection->quote($data, PDO::PARAM_STR);
+				$this->_bindValues[$key] = array($data, PDO::PARAM_STR);
+				return ":$key";
 			default:
 				if ($data === '') {
 					return 'NULL';
@@ -357,7 +368,8 @@ class DboSource extends DataSource {
 				) {
 					return $data;
 				}
-				return $this->_connection->quote($data);
+				$this->_bindValues[$key] = array($data, PDO::PARAM_STR);
+				return ":$key";
 			break;
 		}
 	}
@@ -459,8 +471,16 @@ class DboSource extends DataSource {
 		try {
 			$query = $this->_connection->prepare($sql, $prepareOptions);
 			$query->setFetchMode(PDO::FETCH_LAZY);
+			foreach ($this->_bindValues as $key => $bind) {
+				if (strpos($sql, ':' . $key) !== false) {
+					$query->bindValue(":$key", $bind[0], $bind[1]);
+				}
+			}
+			if (empty($params)) {
+				$params = null;
+			}
 			if (!$query->execute($params)) {
-				$this->_results = $query;
+				$this->_result = $query;
 				$this->error = $this->lastError($query);
 				$query->closeCursor();
 				return false;
@@ -471,7 +491,7 @@ class DboSource extends DataSource {
 			}
 			return $query;
 		} catch (PDOException $e) {
-			$this->_results = null;
+			$this->_result = null;
 			$this->error = $e->getMessage();
 			return false;
 		}
