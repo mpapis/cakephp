@@ -62,7 +62,7 @@ class DboSource extends DataSource {
  * @var array
  * @access public
  */
-	public $methodCache = array();
+	public static $methodCache = array();
 
 /**
  * Whether or not to cache the results of DboSource::name() and DboSource::conditions()
@@ -253,6 +253,14 @@ class DboSource extends DataSource {
  * @access public
  */
 	protected $_bindValues = array();
+
+/**
+ * Indicates whether there was a change on the cached results on the methods of this class
+ * This will be used for storing in a more persistent cache
+ *
+ * @var boolean
+ */
+	protected $_methodCacheChange = false;
 
 /**
  * Constructor
@@ -763,7 +771,8 @@ class DboSource extends DataSource {
  * @return void
  */
 	public function flushMethodCache() {
-		$this->methodCache = array();
+		$this->_methodCacheChange = true;
+		self::$methodCache = array();
 	}
 
 /**
@@ -782,10 +791,14 @@ class DboSource extends DataSource {
 		if ($this->cacheMethods === false) {
 			return $value;
 		}
-		if ($value === null) {
-			return (isset($this->methodCache[$method][$key])) ? $this->methodCache[$method][$key] : null;
+		if (empty(self::$methodCache)) {
+			self::$methodCache = Cache::read('method_cache', '_cake_core_');
 		}
-		return $this->methodCache[$method][$key] = $value;
+		if ($value === null) {
+			return (isset(self::$methodCache[$method][$key])) ? self::$methodCache[$method][$key] : null;
+		}
+		$this->_methodCacheChange = true;
+		return self::$methodCache[$method][$key] = $value;
 	}
 
 /**
@@ -1478,7 +1491,7 @@ class DboSource extends DataSource {
 			$queryData['fields'] = $this->fields($model, $modelAlias);
 		} elseif (!empty($model->hasMany) && $model->recursive > -1) {
 			$assocFields = $this->fields($model, $modelAlias, array("{$modelAlias}.{$model->primaryKey}"));
-			$passedFields = $this->fields($model, $modelAlias, $queryData['fields']);
+			$passedFields = $queryData['fields'];
 			if (count($passedFields) === 1) {
 				if (strpos($passedFields[0], $assocFields[0]) === false && !preg_match('/^[a-z]+\(/i', $passedFields[0])) {
 					$queryData['fields'] = array_merge($passedFields, $assocFields);
@@ -2185,17 +2198,16 @@ class DboSource extends DataSource {
 		if (empty($alias)) {
 			$alias = $model->alias;
 		}
+		$virtualFields = $model->getVirtualField();
 		$cacheKey = array(
-			$model->useDbConfig,
-			$model->table,
-			array_keys($model->schema()),
-			$model->name,
-			$model->getVirtualField(),
 			$alias,
+			get_class($model),
+			$model->alias,
+			$virtualFields,
 			$fields,
 			$quote
 		);
-		$cacheKey = crc32(serialize($cacheKey));
+		$cacheKey = md5(serialize($cacheKey));
 		if ($return = $this->cacheMethod(__FUNCTION__, $cacheKey)) {
 			return $return;
 		}
@@ -2209,7 +2221,6 @@ class DboSource extends DataSource {
 		$allFields = $allFields || in_array('*', $fields) || in_array($model->alias . '.*', $fields);
 
 		$virtual = array();
-		$virtualFields = $model->getVirtualField();
 		if (!empty($virtualFields)) {
 			$virtualKeys = array_keys($virtualFields);
 			foreach ($virtualKeys as $field) {
@@ -2305,25 +2316,6 @@ class DboSource extends DataSource {
  * @return string SQL fragment
  */
 	public function conditions($conditions, $quoteValues = true, $where = true, $model = null) {
-		if (is_object($model)) {
-			$cacheKey = array(
-				$model->useDbConfig,
-				$model->table,
-				$model->schema(),
-				$model->name,
-				$model->getVirtualField(),
-				$conditions,
-				$quoteValues,
-				$where
-			);
-		} else {
-			$cacheKey = array($conditions, $quoteValues, $where);
-		}
-		$cacheKey = crc32(serialize($cacheKey));
-		if ($return = $this->cacheMethod(__FUNCTION__, $cacheKey)) {
-			return $return;
-		}
-
 		$clause = $out = '';
 
 		if ($where) {
@@ -2334,16 +2326,16 @@ class DboSource extends DataSource {
 			$out = $this->conditionKeysToString($conditions, $quoteValues, $model);
 
 			if (empty($out)) {
-				return $this->cacheMethod(__FUNCTION__, $cacheKey, $clause . ' 1 = 1');
+				return $clause . ' 1 = 1';
 			}
-			return $this->cacheMethod(__FUNCTION__, $cacheKey, $clause . implode(' AND ', $out));
+			return $clause . implode(' AND ', $out);
 		}
 		if (is_bool($conditions)) {
-			return $this->cacheMethod(__FUNCTION__, $cacheKey,  $clause . (int)$conditions . ' = 1');
+			return $clause . (int)$conditions . ' = 1';
 		}
 
 		if (empty($conditions) || trim($conditions) === '') {
-			return $this->cacheMethod(__FUNCTION__, $cacheKey, $clause . '1 = 1');
+			return $clause . '1 = 1';
 		}
 		$clauses = '/^WHERE\\x20|^GROUP\\x20BY\\x20|^HAVING\\x20|^ORDER\\x20BY\\x20/i';
 
@@ -2351,7 +2343,7 @@ class DboSource extends DataSource {
 			$clause = '';
 		}
 		$conditions = $this->__quoteFields($conditions);
-		return $this->cacheMethod(__FUNCTION__, $cacheKey, $clause . $conditions);
+		return $clause . $conditions;
 	}
 
 /**
@@ -3158,6 +3150,17 @@ class DboSource extends DataSource {
 			}
 		}
 		return false;
+	}
+
+/**
+ * Used for storing in cache the results of the in-memory methodCache
+ *
+ * @return void
+ */
+	public function __destruct() {
+		if ($this->_methodCacheChange) {
+			Cache::write('method_cache', self::$methodCache, '_cake_core_');
+		}
 	}
 
 }
