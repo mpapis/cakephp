@@ -62,7 +62,7 @@ class CakeHtmlReporter extends CakeBaseReporter {
  */
 	public function paintTestMenu() {
 		$cases = $this->baseUrl() . '?show=cases';
-		$plugins = App::objects('plugin', null, false);
+		$plugins = CakePlugin::loaded();
 		sort($plugins);
 		include CAKE . 'TestSuite' . DS . 'templates' . DS . 'menu.php';
 	}
