@@ -1,6 +1,6 @@
 <?php
 /**
- * CrudAuthorizeTest file
+ * AclAuthorizeTest file
  *
  * PHP 5
  *
@@ -17,13 +17,23 @@
  * @license       MIT License (http://www.opensource.org/licenses/mit-license.php)
  */
 
-App::uses('CrudAuthorize', 'Controller/Component/Auth');
+App::uses('AclAuthorize', 'Controller/Component/Auth');
 App::uses('ComponentCollection', 'Controller');
 App::uses('AclComponent', 'Controller/Component');
 App::uses('CakeRequest', 'Network');
 App::uses('CakeResponse', 'Network');
 
-class CrudAuthorizeTest extends CakeTestCase {
+class TestAclAuthorize extends AclAuthorize {
+
+	function getModel() {}
+
+	function getAco() {
+		return 'Post.1';
+	}
+
+}
+
+class AclAuthorizeTest extends CakeTestCase {
 
 /**
  * setup
@@ -38,7 +48,7 @@ class CrudAuthorizeTest extends CakeTestCase {
 		$this->Acl = $this->getMock('AclComponent', array(), array(), '', false);
 		$this->Components = $this->getMock('ComponentCollection');
 
-		$this->auth = new CrudAuthorize($this->Components);
+		$this->auth = new TestAclAuthorize($this->Components);
 	}
 
 /**
@@ -60,10 +70,11 @@ class CrudAuthorizeTest extends CakeTestCase {
  * @return void
  */
 	public function testAuthorizeNoMappedAction() {
-		$request = new CakeRequest('/posts/foobar', false);
+		$request = new CakeRequest('/posts/foobar/1', false);
 		$request->addParams(array(
 			'controller' => 'posts',
-			'action' => 'foobar'
+			'action' => 'foobar',
+			'pass' => array(1)
 		));
 		$user = array('User' => array('user' => 'mark'));
 
@@ -76,17 +87,18 @@ class CrudAuthorizeTest extends CakeTestCase {
  * @return void
  */
 	public function testAuthorizeCheckSuccess() {
-		$request = new CakeRequest('posts/index', false);
+		$request = new CakeRequest('posts/view/1', false);
 		$request->addParams(array(
 			'controller' => 'posts',
-			'action' => 'index'
+			'action' => 'index',
+			'pass' => array(1)
 		));
 		$user = array('User' => array('user' => 'mark'));
 
 		$this->_mockAcl();
 		$this->Acl->expects($this->once())
 			->method('check')
-			->with($user, 'Posts', 'read')
+			->with($user, 'Post.1', 'read')
 			->will($this->returnValue(true));
 
 		$this->assertTrue($this->auth->authorize($user['User'], $request));
@@ -98,17 +110,18 @@ class CrudAuthorizeTest extends CakeTestCase {
  * @return void
  */
 	public function testAuthorizeCheckFailure() {
-		$request = new CakeRequest('posts/index', false);
+		$request = new CakeRequest('posts/edit/1', false);
 		$request->addParams(array(
 			'controller' => 'posts',
-			'action' => 'index'
+			'action' => 'edit',
+			'pass' => array(1)
 		));
 		$user = array('User' => array('user' => 'mark'));
 
 		$this->_mockAcl();
 		$this->Acl->expects($this->once())
 			->method('check')
-			->with($user, 'Posts', 'read')
+			->with($user, 'Post.1', 'update')
 			->will($this->returnValue(false));
 
 		$this->assertFalse($this->auth->authorize($user['User'], $request));
@@ -180,7 +193,7 @@ class CrudAuthorizeTest extends CakeTestCase {
 		Configure::write('Routing.prefixes', array('admin', 'manager'));
 		Router::reload();
 
-		$auth = new CrudAuthorize($this->Components);
+		$auth = new AclAuthorize($this->Components);
 		$this->assertTrue(isset($auth->settings['actionMap']['admin_index']));
 	}
 
