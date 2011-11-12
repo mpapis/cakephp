@@ -81,12 +81,20 @@ class AclAuthorize extends BaseAuthorize {
  */
 	public function authorize($user, CakeRequest $request) {
 		if (!isset($this->settings['actionMap'][$request->params['action']])) {
+			trigger_error(__d('cake_dev',
+				'AclAuthorize::authorize() - Attempted access of un-mapped action "%1$s" in controller "%2$s"',
+				$request->action,
+				$request->controller
+				),
+				E_USER_WARNING
+			);
 			return false;
 		}
-		$object = $this->getModel();
+
 		if (empty($request->params['pass'][0])) {
 			return false;
 		}
+		$object = $this->getModel();
 		$acoNode = $this->getAco($object, $request->params['pass'][0]);
 		if (!$acoNode) {
 			return false;
@@ -106,7 +114,7 @@ class AclAuthorize extends BaseAuthorize {
 	}
 
 	public function getAco($object, $id) {
-		if (!$object->Behaviors->hasMethod('node')) {
+		if (!$object->Behaviors->attached('Acl')) {
 			return null;
 		}
 		$tmp = $object->id;
