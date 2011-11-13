@@ -315,6 +315,24 @@ class ViewTest extends CakeTestCase {
 		$result = $View->getLayoutFileName();
 		$this->assertEqual($expected, $result);
 
+		$expected = CAKE . 'Test' . DS . 'test_app' . DS . 'View' . DS .'Pages' . DS .'home.ctp';
+		$result = $View->getViewFileName('TestPlugin.home');
+		$this->assertEqual($expected, $result);
+
+		CakePlugin::load('TestPlugin');
+		$expected = CAKE . 'Test' . DS . 'test_app' . DS . 'View' . DS .'Pages' . DS .'home.ctp';
+		$result = $View->getViewFileName('TestPlugin.home');
+		$this->assertEqual($expected, $result);
+
+		$View->viewPath = 'Tests';
+		$expected = CAKE . 'Test' . DS . 'test_app' . DS . 'Plugin' . DS . 'TestPlugin' . DS . 'View' . DS .'Tests' . DS .'index.ctp';
+		$result = $View->getViewFileName('TestPlugin.index');
+		$this->assertEqual($expected, $result);
+
+		$expected = CAKE . 'Test' . DS . 'test_app' . DS . 'Plugin' . DS . 'TestPlugin' . DS . 'View' . DS . 'Layouts' . DS .'default.ctp';
+		$result = $View->getLayoutFileName('TestPlugin.default');
+		$this->assertEqual($expected, $result);
+
 		$View->layoutPath = 'rss';
 		$expected = CAKE . 'Test' . DS . 'test_app' . DS . 'View' . DS . 'Layouts' . DS . 'rss' . DS . 'default.ctp';
 		$result = $View->getLayoutFileName();
@@ -416,6 +434,13 @@ class ViewTest extends CakeTestCase {
 		$result = $this->View->element('plugin_element', array(), array('plugin' => 'test_plugin'));
 		$this->assertEqual($result, 'this is the plugin element using params[plugin]');
 
+		$result = $this->View->element('TestPlugin.plugin_element');
+		$this->assertEqual($result, 'this is the plugin element using params[plugin]');
+
+		$result = $this->View->element('test_plugin.plugin_element');
+		$this->assertPattern('/Not Found:/', $result);
+		$this->assertPattern('/test_plugin.plugin_element/', $result);
+
 		$this->View->plugin = 'TestPlugin';
 		$result = $this->View->element('test_plugin_element');
 		$this->assertEqual($result, 'this is the test set using View::$plugin plugin element');
@@ -423,6 +448,10 @@ class ViewTest extends CakeTestCase {
 		$result = $this->View->element('non_existant_element');
 		$this->assertPattern('/Not Found:/', $result);
 		$this->assertPattern('/non_existant_element/', $result);
+
+		$result = $this->View->element('TestPlugin.plugin_element', array(), array('plugin' => 'test_plugin'));
+		$this->assertPattern('/Not Found:/', $result);
+		$this->assertPattern('/TestPlugin.plugin_element/', $result);
 	}
 
 /**
@@ -727,6 +756,9 @@ class ViewTest extends CakeTestCase {
 		$View = new TestView($this->PostsController);
 
 		$result = $View->getViewFileName('index');
+		$this->assertPattern('/Posts(\/|\\\)index.ctp/', $result);
+
+		$result = $View->getViewFileName('TestPlugin.index');
 		$this->assertPattern('/Posts(\/|\\\)index.ctp/', $result);
 
 		$result = $View->getViewFileName('/Pages/home');
