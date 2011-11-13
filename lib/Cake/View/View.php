@@ -682,7 +682,7 @@ class View extends Object {
  * @param string $name The name you want to plugin split.
  * @return array Array with 2 indexes.  0 => plugin name, 1 => filename
  */
-	function _pluginSplit($name) {
+	protected function _pluginSplit($name) {
 		$plugin = null;
 		list($first, $second) = pluginSplit($name);
 		if (CakePlugin::loaded($first) === true) {
