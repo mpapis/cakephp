@@ -19,7 +19,7 @@
 /**
  * Load Model and AppModel
  */
-App::uses('AppModel', 'Model');
+App::uses('Model', 'Model');
 
 /**
  * ACL Node
@@ -27,7 +27,7 @@ App::uses('AppModel', 'Model');
  *
  * @package       Cake.Model
  */
-class AclNode extends AppModel {
+class AclNode extends Model {
 
 /**
  * Explicitly disable in-memory query caching for ACL models

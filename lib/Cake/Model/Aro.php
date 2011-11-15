@@ -19,7 +19,7 @@
 /**
  * Load Model and AppModel
  */
-App::uses('AppModel', 'Model');
+App::uses('AclNode', 'Model');
 
 /**
  * Access Request Object
