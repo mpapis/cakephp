@@ -16,6 +16,7 @@
  * @license       MIT License (http://www.opensource.org/licenses/mit-license.php)
  */
 
+App::uses('AppShell', 'Console/Command');
 App::uses('BakeTask', 'Console/Command/Task');
 App::uses('Model', 'Model');
 
@@ -90,7 +91,7 @@ class FixtureTask extends BakeTask {
 
 /**
  * Execution method always used for tasks
- * Handles dispatching to interactive, named, or all processeses.
+ * Handles dispatching to interactive, named, or all processes.
  *
  * @return void
  */
