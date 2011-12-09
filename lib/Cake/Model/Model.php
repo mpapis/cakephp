@@ -1953,7 +1953,12 @@ class Model extends Object {
 		}
 		$return = array();
 		foreach ($data as $key => $record) {
-			$validates = ($this->create(null) !== null && $this->save($record, $options));
+			$validates = $this->create(null) !== null;
+			$saved = false;
+			if ($validates) {
+				$saved = $this->saveAssociated($record, array_merge($options, array('atomic' => false)));
+			}
+			$validates = ($validates && ($saved === true || (is_array($saved) && !in_array(false, $saved, true))));
 			if (!$validates) {
 				$validationErrors[$key] = $this->validationErrors;
 			}
@@ -2060,11 +2065,20 @@ class Model extends Object {
 		$validates = true;
 		foreach ($data as $association => $values) {
 			if (isset($associations[$association]) && $associations[$association] === 'belongsTo') {
-				if ($this->{$association}->create(null) !== null && $this->{$association}->save($values, $options)) {
-					$data[$this->alias][$this->belongsTo[$association]['foreignKey']] = $this->{$association}->id;
+				$validates = $this->{$association}->create(null) !== null;
+				$saved = false;
+				if ($validates) {
+					$saved = $this->{$association}->saveAssociated($values, array_merge($options, array('atomic' => false)));
+					$validates = ($saved === true || (is_array($saved) && !in_array(false, $saved, true)));
+				}
+				if ($validates) {
+					if (!empty($data[$this->alias])) {
+						$data[$this->alias][$this->belongsTo[$association]['foreignKey']] = $this->{$association}->id;
+					} else {
+						$data[$this->belongsTo[$association]['foreignKey']] = $this->{$association}->id;
+					}
 				} else {
 					$validationErrors[$association] = $this->{$association}->validationErrors;
-					$validates = false;
 				}
 				$return[$association][] = $validates;
 			}
@@ -2084,9 +2098,14 @@ class Model extends Object {
 				switch ($type) {
 					case 'hasOne':
 						$values[$this->{$type}[$association]['foreignKey']] = $this->id;
-						if (!($this->{$association}->create(null) !== null && $this->{$association}->save($values, $options))) {
+						$validates = $this->{$association}->create(null) !== null;
+						$saved = false;
+						if ($validates) {
+							$saved = $this->{$association}->saveAssociated($values, array_merge($options, array('atomic' => false)));
+						}
+						$validates = ($validates && ($saved === true || (is_array($saved) && !in_array(false, $saved, true))));
+						if (!$validates) {
 							$validationErrors[$association] = $this->{$association}->validationErrors;
-							$validates = false;
 						}
 						$return[$association][] = $validates;
 					break;

@@ -2957,7 +2957,7 @@ class ModelWriteTest extends BaseModelTest {
  * @return void
  */
 	public function testSaveAllAtomic() {
-		$this->loadFixtures('Article', 'User');
+		$this->loadFixtures('Article', 'User', 'Comment');
 		$TestModel = new Article();
 
 		$result = $TestModel->saveAll(array(
@@ -3023,6 +3023,135 @@ class ModelWriteTest extends BaseModelTest {
 			))
 		), array('validate' => true, 'atomic' => false));
 		$this->assertSame($result, array('Article' => true, 'Comment' => array(true, true)));
+	}
+
+/**
+ * testSaveAllDeep method
+ *
+ * @return void
+ */
+	public function testSaveAllDeep() {
+		$this->loadFixtures('Article', 'Comment', 'User', 'Attachment');
+		$TestModel = new Article();
+		$TestModel->hasMany['Comment']['order'] = array('Comment.created' => 'ASC');
+		$TestModel->hasAndBelongsToMany = array();
+
+		$result = $TestModel->saveAll(array(
+			'Article' => array('id' => 2),
+			'Comment' => array(
+				array('comment' => 'First new comment', 'published' => 'Y', 'User' => array('user' => 'newuser', 'password' => 'newuserpass')),
+				array('comment' => 'Second new comment', 'published' => 'Y', 'user_id' => 2)
+			)
+		));
+		$this->assertTrue($result);
+
+		$result = $TestModel->findById(2);
+		$expected = array(
+			'First Comment for Second Article',
+			'Second Comment for Second Article',
+			'First new comment',
+			'Second new comment'
+		);
+		$this->assertEquals($expected, Set::extract($result['Comment'], '{n}.comment'));
+
+		$result = $TestModel->Comment->User->field('id', array('user' => 'newuser', 'password' => 'newuserpass'));
+		$this->assertEquals(5, $result);
+		$result = $TestModel->saveAll(array(
+			'Article' => array('id' => 2),
+			'Comment' => array(
+				array('comment' => 'Third new comment', 'published' => 'Y', 'user_id' => 5),
+				array('comment' => 'Fourth new comment', 'published' => 'Y', 'user_id' => 2, 'Attachment' => array('attachment' => 'deepsaved'))
+			)
+		));
+		$this->assertTrue($result);
+
+		$result = $TestModel->findById(2);
+		$expected = array(
+			'First Comment for Second Article',
+			'Second Comment for Second Article',
+			'First new comment',
+			'Second new comment',
+			'Third new comment',
+			'Fourth new comment'
+		);
+		$this->assertEquals($expected, Set::extract($result['Comment'], '{n}.comment'));
+
+		$result = $TestModel->Comment->Attachment->field('id', array('attachment' => 'deepsaved'));
+		$this->assertEquals(2, $result);
+		$data = array(
+			'Attachment' => array(
+				'attachment' => 'deepsave insert',
+			),
+			'Comment' => array(
+				'comment' => 'First comment deepsave insert',
+				'published' => 'Y',
+				'user_id' => 5,
+				'Article' => array(
+					'title' => 'First Article deepsave insert',
+					'body' => 'First Article Body deepsave insert',
+					'User' => array(
+						'user' => 'deepsave',
+						'password' => 'magic'
+					),
+				),
+			)
+		);
+
+		$TestModel->Comment->Attachment->create();
+		$result = $TestModel->Comment->Attachment->saveAll($data);
+		$this->assertTrue($result);
+
+		$result = $TestModel->Comment->Attachment->findById($TestModel->Comment->Attachment->id);
+		$expected = array(
+			'Attachment' => array(
+				'id' => '3',
+				'comment_id' => '11',
+				'attachment' => 'deepsave insert',
+			),
+			'Comment' => array(
+				'id' => '11',
+				'article_id' => '4',
+				'user_id' => '5',
+				'comment' => 'First comment deepsave insert',
+				'published' => 'Y',
+			)
+		);
+		unset($result['Attachment']['created'], $result['Attachment']['updated']);
+		$this->assertEquals($expected['Attachment'], $result['Attachment']);
+
+		unset($result['Comment']['created'], $result['Comment']['updated']);
+		$this->assertEquals($result['Comment'], $expected['Comment']);
+
+		$result = $TestModel->findById($result['Comment']['article_id']);
+		$expected = array(
+			'Article' => array(
+				'id' => '4',
+				'user_id' => '6',
+				'title' => 'First Article deepsave insert',
+				'body' => 'First Article Body deepsave insert',
+				'published' => 'N',
+			),
+			'User' => array(
+				'id' => '6',
+				'user' => 'deepsave',
+				'password' => 'magic',
+			),
+			'Comment' => array(
+				array(
+					'id' => '11',
+					'article_id' => '4',
+					'user_id' => '5',
+					'comment' => 'First comment deepsave insert',
+					'published' => 'Y',
+				)
+			)
+		);
+		unset(
+			$result['Article']['created'], $result['Article']['updated'],
+			$result['User']['created'], $result['User']['updated'],
+			$result['Comment'][0]['created'], $result['Comment'][0]['updated']
+		);
+		$this->assertEquals($result, $expected);
 	}
 
 /**
@@ -3196,7 +3325,7 @@ class ModelWriteTest extends BaseModelTest {
 		$db->expects($this->once())->method('rollback');
 		$db->expects($this->any())->method('describe')
 			->will($this->returnValue(array(
-				'id' => array('type' => 'integer'),
+				'id' => array('type' => 'integer', 'length' => 11),
 				'title' => array('type' => 'string'),
 				'body' => array('type' => 'text'),
 				'published' => array('type' => 'string')
@@ -4525,7 +4654,7 @@ class ModelWriteTest extends BaseModelTest {
 		$db->expects($this->once())->method('rollback');
 		$db->expects($this->any())->method('describe')
 			->will($this->returnValue(array(
-				'id' => array('type' => 'integer'),
+				'id' => array('type' => 'integer', 'length' => 11),
 				'title' => array('type' => 'string'),
 				'body' => array('type' => 'text'),
 				'published' => array('type' => 'string')
