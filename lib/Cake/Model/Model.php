@@ -2832,7 +2832,7 @@ class Model extends Object implements CakeEventListener {
 			foreach ($results as $result) {
 				$result['children'] = array();
 				$id = $result[$this->alias][$this->primaryKey];
-				$parentId = $result[$this->alias]['parent_id'];
+				$parentId = $result[$this->alias][$parent];
 				if (isset($idMap[$id]['children'])) {
 					$idMap[$id] = array_merge($result, (array)$idMap[$id]);
 				} else {
@@ -2845,11 +2845,11 @@ class Model extends Object implements CakeEventListener {
 				}
 			}
 			if (count($return) > 1) {
-				$ids = array_unique(Set::extract('/' . $this->alias . '/parent_id', $return));
+				$ids = array_unique(Set::extract('/' . $this->alias . '/' . $parent, $return));
 				if (count($ids) > 1) {
-					$root = $return[0][$this->alias]['parent_id'];
+					$root = $return[0][$this->alias][$parent];
 					foreach ($return as $key => $value) {
-						if ($value[$this->alias]['parent_id'] != $root) {
+						if ($value[$this->alias][$parent] != $root) {
 							unset($return[$key]);
 						}
 					}
