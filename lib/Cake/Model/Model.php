@@ -2813,7 +2813,14 @@ class Model extends Object implements CakeEventListener {
 			return $query;
 		} elseif ($state === 'after') {
 			$return = $idMap = array();
-			if ((!array_key_exists('parent_id', $this->schema()))) {
+			$parent = 'parent_id';
+			if ($this->Behaviors->attached('Tree')) {
+				$parent = $this->Behaviors->Tree->settings[$this->alias]['parent'];
+			}
+			if (isset($query['parent'])) {
+				$parent = $query['parent'];
+			}
+			if ((!array_key_exists($parent, $this->schema()))) {
 				trigger_error(
 					__d('cake_dev', 'You cannot use find("threaded") on models without a "parent_id" field.'),
 					E_USER_WARNING
