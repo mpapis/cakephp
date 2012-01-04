@@ -2817,9 +2817,9 @@ class Model extends Object implements CakeEventListener {
 			if (isset($query['parent'])) {
 				$parent = $query['parent'];
 			}
-			if ((!array_key_exists($parent, $this->schema()))) {
+			if (!$this->hasField($parent, true)) {
 				trigger_error(
-					__d('cake_dev', 'You cannot use find("threaded") on models without a "parent_id" field.'),
+					__d('cake_dev', 'You cannot use find("threaded") without %s field.', $parent),
 					E_USER_WARNING
 				);
 				return $return;
