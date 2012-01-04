@@ -2814,9 +2814,6 @@ class Model extends Object implements CakeEventListener {
 		} elseif ($state === 'after') {
 			$return = $idMap = array();
 			$parent = 'parent_id';
-			if ($this->Behaviors->attached('Tree')) {
-				$parent = $this->Behaviors->Tree->settings[$this->alias]['parent'];
-			}
 			if (isset($query['parent'])) {
 				$parent = $query['parent'];
 			}
