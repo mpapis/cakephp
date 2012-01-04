@@ -2813,18 +2813,18 @@ class Model extends Object implements CakeEventListener {
 			return $query;
 		} elseif ($state === 'after') {
 			$return = $idMap = array();
-			$ids = Set::extract($results, '{n}.' . $this->alias . '.' . $this->primaryKey);
+			if ((!array_key_exists('parent_id', $this->schema()))) {
+				trigger_error(
+					__d('cake_dev', 'You cannot use find("threaded") on models without a "parent_id" field.'),
+					E_USER_WARNING
+				);
+				return $return;
+			}
 
+			$ids = Set::extract($results, '{n}.' . $this->alias . '.' . $this->primaryKey);
 			foreach ($results as $result) {
 				$result['children'] = array();
 				$id = $result[$this->alias][$this->primaryKey];
-				if (!isset($result[$this->alias]['parent_id'])) {
-					trigger_error(
-						__d('cake_dev', 'You cannot use find("threaded") on models without a "parent_id" field.'),
-						E_USER_WARNING
-					);
-					return $return;
-				}
 				$parentId = $result[$this->alias]['parent_id'];
 				if (isset($idMap[$id]['children'])) {
 					$idMap[$id] = array_merge($result, (array)$idMap[$id]);
