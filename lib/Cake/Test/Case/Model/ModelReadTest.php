@@ -2991,7 +2991,7 @@ class ModelReadTest extends BaseModelTest {
 	}
 
 /**
- * find(threaded) should trigger errors whne there is no parent_id field.
+ * find(threaded) should trigger errors when there is no parent_id field.
  *
  * @expectedException PHPUnit_Framework_Error_Warning
  * @return void
@@ -3000,6 +3000,19 @@ class ModelReadTest extends BaseModelTest {
 		$this->loadFixtures('Apple', 'Sample');
 		$Apple = new Apple();
 		$Apple->find('threaded');
+	}
+
+/**
+ * find(threaded) should trigger errors when incorrect parent field is set.
+ *
+ * @expectedException PHPUnit_Framework_Error_Warning
+ * @return void
+ */
+	public function testFindThreadedParentError() {
+		$this->loadFixtures('Category');
+		$TestModel = new Category();
+
+		$result = $TestModel->find('threaded', array('parent' => 'non_existing'));
 	}
 
 /**
