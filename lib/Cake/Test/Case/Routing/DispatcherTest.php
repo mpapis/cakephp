@@ -877,7 +877,7 @@ class DispatcherTest extends CakeTestCase {
  */
 	public function testAutomaticPluginDispatch() {
 		$_POST = array();
-		$_SERVER['SCRIPT_NAME'] = '/cake/repo/branches/1.2.x.x/index.php';
+		$_SERVER['PHP_SELF'] = '/cake/repo/branches/1.2.x.x/index.php';
 
 		Router::reload();
 		$Dispatcher = new TestDispatcher();
@@ -1124,7 +1124,7 @@ class DispatcherTest extends CakeTestCase {
 		$result = $Dispatcher->dispatch($url, $response, array('return' => 1));
 		$this->assertTrue(class_exists('TestsController'));
 		$this->assertTrue(class_exists('TestPluginAppController'));
-		$this->assertTrue(class_exists('PluginsComponentComponent'));
+		$this->assertTrue(class_exists('PluginsComponent'));
 
 		$this->assertEquals($result->params['controller'], 'tests');
 		$this->assertEquals($result->params['plugin'], 'test_plugin');

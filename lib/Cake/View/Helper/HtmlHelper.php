@@ -232,7 +232,7 @@ class HtmlHelper extends AppHelper {
  *
  * ### Options
  *
- * - `inline` Whether or not the link element should be output inline. Set to false to 
+ * - `inline` Whether or not the link element should be output inline. Set to false to
  *   have the meta tag included in `$scripts_for_layout`, and appended to the 'meta' view block.
  * - `block` Choose a custom block to append the meta tag to.  Using this option
  *   will override the inline option.
@@ -401,7 +401,7 @@ class HtmlHelper extends AppHelper {
  *
  * ### Options
  *
- * - `inline` If set to false, the generated tag will be appended to the 'css' block, 
+ * - `inline` If set to false, the generated tag will be appended to the 'css' block,
  *   and included in the `$scripts_for_layout` layout variable. Defaults to true.
  * - `block` Set the name of the block link/style tag will be appended to.  This overrides the `inline`
  *   option.
@@ -455,12 +455,12 @@ class HtmlHelper extends AppHelper {
 		}
 
 		if ($rel == 'import') {
-			$out = sprintf($this->_tags['style'], $this->_parseAttributes($options, array('inline'), '', ' '), '@import url(' . $url . ');');
+			$out = sprintf($this->_tags['style'], $this->_parseAttributes($options, array('inline', 'block'), '', ' '), '@import url(' . $url . ');');
 		} else {
 			if ($rel == null) {
 				$rel = 'stylesheet';
 			}
-			$out = sprintf($this->_tags['css'], $rel, $url, $this->_parseAttributes($options, array('inline'), '', ' '));
+			$out = sprintf($this->_tags['css'], $rel, $url, $this->_parseAttributes($options, array('inline', 'block'), '', ' '));
 		}
 
 		if (empty($options['block'])) {
@@ -658,8 +658,16 @@ class HtmlHelper extends AppHelper {
 /**
  * Returns the breadcrumb trail as a sequence of &raquo;-separated links.
  *
+ * If `$startText` is an array, the accepted keys are:
+ *
+ * - `text` Define the text/content for the link.
+ * - `url` Define the target of the created link.
+ *
+ * All other keys will be passed to HtmlHelper::link() as the `$options` parameter.
+ *
  * @param string $separator Text to separate crumbs.
- * @param string $startText This will be the first crumb, if false it defaults to first crumb in array
+ * @param mixed $startText This will be the first crumb, if false it defaults to first crumb in array. Can
+ *   also be an array, see above for details.
  * @return string Composed bread crumbs
  * @link http://book.cakephp.org/2.0/en/core-libraries/helpers/html.html#creating-breadcrumb-trails-with-htmlhelper
  */
@@ -667,7 +675,17 @@ class HtmlHelper extends AppHelper {
 		if (!empty($this->_crumbs)) {
 			$out = array();
 			if ($startText) {
-				$out[] = $this->link($startText, '/');
+				if (!is_array($startText)) {
+					$startText = array(
+						'url' => '/',
+						'text' => $startText
+					);
+				}
+				$startText += array('url' => '/', 'text' => __('Home'));
+				list($url, $text) = array($startText['url'], $startText['text']);
+				unset($startText['url'], $startText['text']);
+
+				$out[] = $this->link($text, $url, $startText);
 			}
 
 			foreach ($this->_crumbs as $crumb) {
@@ -1069,95 +1087,6 @@ class HtmlHelper extends AppHelper {
 			$this->_minimizedAttributeFormat = $configs['minimizedAttributeFormat'];
 		}
 		return $configs;
-	}
-
-/**
- * Returns a space-delimited string with items of the $options array. If a
- * key of $options array happens to be one of:
- *
- * - 'compact'
- * - 'checked'
- * - 'declare'
- * - 'readonly'
- * - 'disabled'
- * - 'selected'
- * - 'defer'
- * - 'ismap'
- * - 'nohref'
- * - 'noshade'
- * - 'nowrap'
- * - 'multiple'
- * - 'noresize'
- *
- * And its value is one of:
- *
- * - '1' (string)
- * - 1 (integer)
- * - true (boolean)
- * - 'true' (string)
- *
- * Then the value will be reset to be identical with key's name.
- * If the value is not one of these 3, the parameter is not output.
- *
- * 'escape' is a special option in that it controls the conversion of
- *  attributes to their html-entity encoded equivalents.  Set to false to disable html-encoding.
- *
- * If value for any option key is set to `null` or `false`, that option will be excluded from output.
- *
- * @param array $options Array of options.
- * @param array $exclude Array of options to be excluded, the options here will not be part of the return.
- * @param string $insertBefore String to be inserted before options.
- * @param string $insertAfter String to be inserted after options.
- * @return string Composed attributes.
- */
-	protected function _parseAttributes($options, $exclude = null, $insertBefore = ' ', $insertAfter = null) {
-		if (is_array($options)) {
-			$options = array_merge(array('escape' => true), $options);
-
-			if (!is_array($exclude)) {
-				$exclude = array();
-			}
-			$filtered = array_diff_key($options, array_merge(array_flip($exclude), array('escape' => true)));
-			$escape = $options['escape'];
-			$attributes = array();
-
-			foreach ($filtered as $key => $value) {
-				if ($value !== false && $value !== null) {
-					$attributes[] = $this->_formatAttribute($key, $value, $escape);
-				}
-			}
-			$out = implode(' ', $attributes);
-		} else {
-			$out = $options;
-		}
-		return $out ? $insertBefore . $out . $insertAfter : '';
-	}
-
-/**
- * Formats an individual attribute, and returns the string value of the composed attribute.
- * Works with minimized attributes that have the same value as their name such as 'disabled' and 'checked'
- *
- * @param string $key The name of the attribute to create
- * @param string $value The value of the attribute to create.
- * @param boolean $escape Define if the value must be escaped
- * @return string The composed attribute.
- */
-	protected function _formatAttribute($key, $value, $escape = true) {
-		$attribute = '';
-		if (is_array($value)) {
-			$value = '';
-		}
-
-		if (is_numeric($key)) {
-			$attribute = sprintf($this->_minimizedAttributeFormat, $value, $value);
-		} elseif (in_array($key, $this->_minimizedAttributes)) {
-			if ($value === 1 || $value === true || $value === 'true' || $value === '1' || $value == $key) {
-				$attribute = sprintf($this->_minimizedAttributeFormat, $key, $key);
-			}
-		} else {
-			$attribute = sprintf($this->_attributeFormat, $key, ($escape ? h($value) : $value));
-		}
-		return $attribute;
 	}
 
 }

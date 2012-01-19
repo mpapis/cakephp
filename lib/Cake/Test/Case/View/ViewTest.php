@@ -257,7 +257,6 @@ class ViewTest extends CakeTestCase {
 		$expected = array(
 			CAKE . 'Test' . DS . 'test_app' . DS . 'View' . DS . 'Plugin' . DS . 'TestPlugin' . DS,
 			$pluginPath . 'View' . DS,
-			$pluginPath . 'views' . DS,
 			$pluginPath . 'Lib' . DS . 'View' . DS,
 			CAKE . 'Test' . DS . 'test_app' . DS . 'View' . DS,
 			CAKE . 'View' . DS
@@ -678,7 +677,7 @@ class ViewTest extends CakeTestCase {
 					$this->attributeEqualTo('_subject', $View)
 				)
 			);
-			
+
 		$View->Helpers->expects($this->at(4))->method('trigger')
 			->with(
 				$this->logicalAnd(
@@ -1236,5 +1235,31 @@ Element content.
 
 TEXT;
 		$this->assertEquals($expected, $content);
+	}
+
+/**
+ * Test that setting arbitrary properties still works.
+ *
+ * @return void
+ */
+	public function testPropertySetting() {
+		$this->assertFalse(isset($this->View->pageTitle));
+		$this->View->pageTitle = 'test';
+		$this->assertTrue(isset($this->View->pageTitle));
+		$this->assertTrue(!empty($this->View->pageTitle));
+		$this->assertEquals('test', $this->View->pageTitle);
+	}
+
+/**
+ * Test that setting arbitrary properties still works.
+ *
+ * @return void
+ */
+	public function testPropertySettingMagicGet() {
+		$this->assertFalse(isset($this->View->action));
+		$this->View->request->params['action'] = 'login';
+		$this->assertEquals('login', $this->View->action);
+		$this->assertTrue(isset($this->View->action));
+		$this->assertTrue(!empty($this->View->action));
 	}
 }
