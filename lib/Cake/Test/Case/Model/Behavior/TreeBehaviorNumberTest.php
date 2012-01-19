@@ -54,7 +54,7 @@ class TreeBehaviorNumberTest extends CakeTestCase {
  *
  * @var array
  */
-	public $fixtures = array('core.number_tree');
+	public $fixtures = array('core.number_tree', 'core.person');
 
 /**
  * testInitialize method
@@ -1283,5 +1283,171 @@ class TreeBehaviorNumberTest extends CakeTestCase {
 		$this->assertSame($this->Tree->childCount(2), $this->Tree->childCount(array('id' => 2)));
 		$this->assertSame($this->Tree->getParentNode(2), $this->Tree->getParentNode(array('id' => 2)));
 		$this->assertSame($this->Tree->getPath(4), $this->Tree->getPath(array('id' => 4)));
+	}
+
+/**
+ * testFindThreaded method
+ *
+ * @return void
+ */
+	public function testFindThreaded() {
+		$this->loadFixtures('Person');
+		$Model = new Person();
+		$Model->Behaviors->attach('Tree', array('parent' => 'mother_id'));
+
+		$result = $Model->find('threaded');
+		$expected = array(
+			array(
+				'Person' => array(
+					'id' => '4',
+					'name' => 'mother - grand mother',
+					'mother_id' => '0',
+					'father_id' => '0'
+				),
+				'Mother' => array(
+					'id' => null,
+					'name' => null,
+					'mother_id' => null,
+					'father_id' => null
+				),
+				'Father' => array(
+					'id' => null,
+					'name' => null,
+					'mother_id' => null,
+					'father_id' => null
+				),
+				'children' => array(
+					array(
+						'Person' => array(
+							'id' => '2',
+							'name' => 'mother',
+							'mother_id' => '4',
+							'father_id' => '5'
+						),
+						'Mother' => array(
+							'id' => '4',
+							'name' => 'mother - grand mother',
+							'mother_id' => '0',
+							'father_id' => '0'
+						),
+						'Father' => array(
+							'id' => '5',
+							'name' => 'mother - grand father',
+							'mother_id' => '0',
+							'father_id' => '0'
+						),
+						'children' => array(
+							array(
+								'Person' => array(
+									'id' => '1',
+									'name' => 'person',
+									'mother_id' => '2',
+									'father_id' => '3'
+								),
+								'Mother' => array(
+									'id' => '2',
+									'name' => 'mother',
+									'mother_id' => '4',
+									'father_id' => '5'
+								),
+								'Father' => array(
+									'id' => '3',
+									'name' => 'father',
+									'mother_id' => '6',
+									'father_id' => '7'
+								),
+								'children' => array()
+							)
+						)
+					)
+				)
+			),
+			array(
+				'Person' => array(
+					'id' => '5',
+					'name' => 'mother - grand father',
+					'mother_id' => '0',
+					'father_id' => '0'
+				),
+				'Mother' => array(
+					'id' => null,
+					'name' => null,
+					'mother_id' => null,
+					'father_id' => null
+				),
+				'Father' => array(
+					'id' => null,
+					'name' => null,
+					'mother_id' => null,
+					'father_id' => null
+				),
+				'children' => array()
+			),
+			array(
+				'Person' => array(
+					'id' => '6',
+					'name' => 'father - grand mother',
+					'mother_id' => '0',
+					'father_id' => '0'
+				),
+				'Mother' => array(
+					'id' => null,
+					'name' => null,
+					'mother_id' => null,
+					'father_id' => null
+				),
+				'Father' => array(
+					'id' => null,
+					'name' => null,
+					'mother_id' => null,
+					'father_id' => null
+				),
+				'children' => array(
+					array(
+						'Person' => array(
+							'id' => '3',
+							'name' => 'father',
+							'mother_id' => '6',
+							'father_id' => '7'
+						),
+						'Mother' => array(
+							'id' => '6',
+							'name' => 'father - grand mother',
+							'mother_id' => '0',
+							'father_id' => '0'
+						),
+						'Father' => array(
+							'id' => '7',
+							'name' => 'father - grand father',
+							'mother_id' => '0',
+							'father_id' => '0'
+						),
+						'children' => array()
+					)
+				)
+			),
+			array(
+				'Person' => array(
+					'id' => '7',
+					'name' => 'father - grand father',
+					'mother_id' => '0',
+					'father_id' => '0'
+				),
+				'Mother' => array(
+					'id' => null,
+					'name' => null,
+					'mother_id' => null,
+					'father_id' => null
+				),
+				'Father' => array(
+					'id' => null,
+					'name' => null,
+					'mother_id' => null,
+					'father_id' => null
+				),
+				'children' => array()
+			)
+		);
+		$this->assertEquals($expected, $result);
 	}
 }
