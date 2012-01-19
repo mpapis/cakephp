@@ -1293,6 +1293,7 @@ class TreeBehaviorNumberTest extends CakeTestCase {
 	public function testFindThreaded() {
 		$this->loadFixtures('Person');
 		$Model = new Person();
+		$Model->recursive = -1;
 		$Model->Behaviors->attach('Tree', array('parent' => 'mother_id'));
 
 		$result = $Model->find('threaded');
@@ -1304,18 +1305,6 @@ class TreeBehaviorNumberTest extends CakeTestCase {
 					'mother_id' => '0',
 					'father_id' => '0'
 				),
-				'Mother' => array(
-					'id' => null,
-					'name' => null,
-					'mother_id' => null,
-					'father_id' => null
-				),
-				'Father' => array(
-					'id' => null,
-					'name' => null,
-					'mother_id' => null,
-					'father_id' => null
-				),
 				'children' => array(
 					array(
 						'Person' => array(
@@ -1324,18 +1313,6 @@ class TreeBehaviorNumberTest extends CakeTestCase {
 							'mother_id' => '4',
 							'father_id' => '5'
 						),
-						'Mother' => array(
-							'id' => '4',
-							'name' => 'mother - grand mother',
-							'mother_id' => '0',
-							'father_id' => '0'
-						),
-						'Father' => array(
-							'id' => '5',
-							'name' => 'mother - grand father',
-							'mother_id' => '0',
-							'father_id' => '0'
-						),
 						'children' => array(
 							array(
 								'Person' => array(
@@ -1343,18 +1320,6 @@ class TreeBehaviorNumberTest extends CakeTestCase {
 									'name' => 'person',
 									'mother_id' => '2',
 									'father_id' => '3'
-								),
-								'Mother' => array(
-									'id' => '2',
-									'name' => 'mother',
-									'mother_id' => '4',
-									'father_id' => '5'
-								),
-								'Father' => array(
-									'id' => '3',
-									'name' => 'father',
-									'mother_id' => '6',
-									'father_id' => '7'
 								),
 								'children' => array()
 							)
@@ -1369,18 +1334,6 @@ class TreeBehaviorNumberTest extends CakeTestCase {
 					'mother_id' => '0',
 					'father_id' => '0'
 				),
-				'Mother' => array(
-					'id' => null,
-					'name' => null,
-					'mother_id' => null,
-					'father_id' => null
-				),
-				'Father' => array(
-					'id' => null,
-					'name' => null,
-					'mother_id' => null,
-					'father_id' => null
-				),
 				'children' => array()
 			),
 			array(
@@ -1390,18 +1343,6 @@ class TreeBehaviorNumberTest extends CakeTestCase {
 					'mother_id' => '0',
 					'father_id' => '0'
 				),
-				'Mother' => array(
-					'id' => null,
-					'name' => null,
-					'mother_id' => null,
-					'father_id' => null
-				),
-				'Father' => array(
-					'id' => null,
-					'name' => null,
-					'mother_id' => null,
-					'father_id' => null
-				),
 				'children' => array(
 					array(
 						'Person' => array(
@@ -1409,18 +1350,6 @@ class TreeBehaviorNumberTest extends CakeTestCase {
 							'name' => 'father',
 							'mother_id' => '6',
 							'father_id' => '7'
-						),
-						'Mother' => array(
-							'id' => '6',
-							'name' => 'father - grand mother',
-							'mother_id' => '0',
-							'father_id' => '0'
-						),
-						'Father' => array(
-							'id' => '7',
-							'name' => 'father - grand father',
-							'mother_id' => '0',
-							'father_id' => '0'
 						),
 						'children' => array()
 					)
@@ -1432,18 +1361,6 @@ class TreeBehaviorNumberTest extends CakeTestCase {
 					'name' => 'father - grand father',
 					'mother_id' => '0',
 					'father_id' => '0'
-				),
-				'Mother' => array(
-					'id' => null,
-					'name' => null,
-					'mother_id' => null,
-					'father_id' => null
-				),
-				'Father' => array(
-					'id' => null,
-					'name' => null,
-					'mother_id' => null,
-					'father_id' => null
 				),
 				'children' => array()
 			)
