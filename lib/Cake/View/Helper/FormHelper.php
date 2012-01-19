@@ -719,7 +719,7 @@ class FormHelper extends AppHelper {
 					unset($options['listOptions']);
 				}
 				array_unshift($listParams, $error);
-				$error = call_user_func_array(array($this->Html, 'nestedList'), $listParams);
+				$error = $this->Html->dispatchMethod('nestedList', $listParams);
 			} else {
 				$error = array_pop($error);
 			}
@@ -739,7 +739,7 @@ class FormHelper extends AppHelper {
  *
  * ### Options
  *
- * - `for` - Set the for attribute, if its not defined the for attribute 
+ * - `for` - Set the for attribute, if its not defined the for attribute
  *   will be generated from the $fieldName parameter using
  *   FormHelper::domId().
  *
@@ -776,8 +776,8 @@ class FormHelper extends AppHelper {
  * }}}
  *
  * @param string $fieldName This should be "Modelname.fieldname"
- * @param string $text Text that will appear in the label field.  If 
- *   $text is left undefined the text will be inflected from the 
+ * @param string $text Text that will appear in the label field.  If
+ *   $text is left undefined the text will be inflected from the
  *   fieldName.
  * @param mixed $options An array of HTML attributes, or a string, to be used as a class name.
  * @return string The formatted LABEL element

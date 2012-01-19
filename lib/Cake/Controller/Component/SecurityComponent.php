@@ -22,7 +22,7 @@ App::uses('String', 'Utility');
 App::uses('Security', 'Utility');
 
 /**
- * The Security Component creates an easy way to integrate tighter security in 
+ * The Security Component creates an easy way to integrate tighter security in
  * your application. It provides methods for various tasks like:
  *
  * - Restricting which HTTP methods your application accepts.
@@ -567,7 +567,7 @@ class SecurityComponent extends Component {
  */
 	protected function _callback($controller, $method, $params = array()) {
 		if (is_callable(array($controller, $method))) {
-			return call_user_func_array(array(&$controller, $method), empty($params) ? null : $params);
+			return $controller->dispatchMethod($method, empty($params) ? null : $params);
 		} else {
 			return null;
 		}

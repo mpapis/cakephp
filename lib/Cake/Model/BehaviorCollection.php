@@ -233,10 +233,7 @@ class BehaviorCollection extends ObjectCollection {
 			array_unshift($params, $method[2]);
 			unset($method[2]);
 		}
-		return call_user_func_array(
-			array($this->_loaded[$method[0]], $method[1]),
-			array_merge(array(&$model), $params)
-		);
+		return $this->_loaded[$method[0]]->dispatchMethod($method[1], array_merge(array($model), $params));
 	}
 
 /**

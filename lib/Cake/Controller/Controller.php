@@ -807,8 +807,8 @@ class Controller extends Object {
 		$this->request->params['action'] = $action;
 		$this->view = $action;
 		$args = func_get_args();
-		unset($args[0]);
-		return call_user_func_array(array(&$this, $action), $args);
+		array_shift($args);
+		return $this->dispatchMethod($action, $args);
 	}
 
 /**
@@ -818,7 +818,7 @@ class Controller extends Object {
  */
 	public function validate() {
 		$args = func_get_args();
-		$errors = call_user_func_array(array(&$this, 'validateErrors'), $args);
+		$errors = $this->dispatchMethod('validateErrors', $args);
 
 		if ($errors === false) {
 			return 0;

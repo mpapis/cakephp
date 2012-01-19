@@ -2872,7 +2872,7 @@ class Model extends Object {
 	public function query($sql) {
 		$params = func_get_args();
 		$db = $this->getDataSource();
-		return call_user_func_array(array(&$db, 'query'), $params);
+		return $db->dispatchMethod('query', $params);
 	}
 
 /**
