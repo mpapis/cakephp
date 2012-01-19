@@ -2817,13 +2817,6 @@ class Model extends Object implements CakeEventListener {
 			if (isset($query['parent'])) {
 				$parent = $query['parent'];
 			}
-			if (!$this->hasField($parent, true)) {
-				trigger_error(
-					__d('cake_dev', 'You cannot use find("threaded") without %s field.', $parent),
-					E_USER_WARNING
-				);
-				return array();
-			}
 			return Set::nest($results, array(
 				'idPath' => '/' . $this->alias . '/' . $this->primaryKey,
 				'parentPath' => '/' . $this->alias . '/' . $parent
