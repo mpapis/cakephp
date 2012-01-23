@@ -169,11 +169,11 @@ class MemcacheEngineTest extends CakeTestCase {
  *
  * @return void
  */
-    function testParseServerStringUnix() {
-        $Memcache =& new TestMemcacheEngine();
-        $result = $Memcache->parseServerString('unix:///path/to/memcached.sock');
-        $this->assertEquals($result, array('unix:///path/to/memcached.sock', 0));
-    }
+	function testParseServerStringUnix() {
+		$Memcache =& new TestMemcacheEngine();
+		$result = $Memcache->parseServerString('unix:///path/to/memcached.sock');
+		$this->assertEquals($result, array('unix:///path/to/memcached.sock', 0));
+	}
 
 /**
  * testReadAndWriteCache method
@@ -311,14 +311,14 @@ class MemcacheEngineTest extends CakeTestCase {
  */
 	public function testConfigurationConflict() {
 		Cache::config('long_memcache', array(
-		  'engine' => 'Memcache',
-		  'duration' => '+2 seconds',
-		  'servers' => array('127.0.0.1:11211'),
+			'engine' => 'Memcache',
+			'duration' => '+2 seconds',
+			'servers' => array('127.0.0.1:11211'),
 		));
 		Cache::config('short_memcache', array(
-		  'engine' => 'Memcache',
-		  'duration' => '+1 seconds',
-		  'servers' => array('127.0.0.1:11211'),
+			'engine' => 'Memcache',
+			'duration' => '+1 seconds',
+			'servers' => array('127.0.0.1:11211'),
 		));
 		Cache::config('some_file', array('engine' => 'File'));
 
@@ -364,6 +364,7 @@ class MemcacheEngineTest extends CakeTestCase {
 
 		Cache::clear(false, 'memcache2');
 	}
+
 /**
  * test that a 0 duration can succesfully write.
  *

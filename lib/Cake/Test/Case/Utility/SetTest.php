@@ -1291,6 +1291,7 @@ class SetTest extends CakeTestCase {
 		$this->assertSame($expected, $result);
 		$this->assertSame($result, Set::extract('{n}.B.field1', $items));
 	}
+
 /**
  * testExtractWithArrays method
  *
@@ -2814,26 +2815,26 @@ class SetTest extends CakeTestCase {
 
 		$string = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 		<rss version="2.0">
-		  <channel>
-		  <title>Cake PHP Google Group</title>
-		  <link>http://groups.google.com/group/cake-php</link>
-		  <description>Search this group before posting anything. There are over 20,000 posts and it&amp;#39;s very likely your question was answered before. Visit the IRC channel #cakephp at irc.freenode.net for live chat with users and developers of Cake. If you post, tell us the version of Cake, PHP, and database.</description>
-		  <language>en</language>
-		  	<item>
-			  <title>constructng result array when using findall</title>
-			  <link>http://groups.google.com/group/cake-php/msg/49bc00f3bc651b4f</link>
-			  <description>i&#39;m using cakephp to construct a logical data model array that will be &lt;br&gt; passed to a flex app. I have the following model association: &lt;br&gt; ServiceDay-&amp;gt;(hasMany)ServiceTi me-&amp;gt;(hasMany)ServiceTimePrice. So what &lt;br&gt; the current output from my findall is something like this example: &lt;br&gt; &lt;p&gt;Array( &lt;br&gt; [0] =&amp;gt; Array(</description>
-			  <guid isPermaLink="true">http://groups.google.com/group/cake-php/msg/49bc00f3bc651b4f</guid>
-			  <author>bmil...@gmail.com(bpscrugs)</author>
-			  <pubDate>Fri, 28 Dec 2007 00:44:14 UT</pubDate>
-			  </item>
-			  <item>
-			  <title>Re: share views between actions?</title>
-			  <link>http://groups.google.com/group/cake-php/msg/8b350d898707dad8</link>
-			  <description>Then perhaps you might do us all a favour and refrain from replying to &lt;br&gt; things you do not understand. That goes especially for asinine comments. &lt;br&gt; Indeed. &lt;br&gt; To sum up: &lt;br&gt; No comment. &lt;br&gt; In my day, a simple &amp;quot;RTFM&amp;quot; would suffice. I&#39;ll keep in mind to ignore any &lt;br&gt; further responses from you. &lt;br&gt; You (and I) were referring to the *online documentation*, not other</description>
-			  <guid isPermaLink="true">http://groups.google.com/group/cake-php/msg/8b350d898707dad8</guid>
-			  <author>subtropolis.z...@gmail.com(subtropolis zijn)</author>
-			  <pubDate>Fri, 28 Dec 2007 00:45:01 UT</pubDate>
+			<channel>
+			<title>Cake PHP Google Group</title>
+			<link>http://groups.google.com/group/cake-php</link>
+			<description>Search this group before posting anything. There are over 20,000 posts and it&amp;#39;s very likely your question was answered before. Visit the IRC channel #cakephp at irc.freenode.net for live chat with users and developers of Cake. If you post, tell us the version of Cake, PHP, and database.</description>
+			<language>en</language>
+				<item>
+				<title>constructng result array when using findall</title>
+				<link>http://groups.google.com/group/cake-php/msg/49bc00f3bc651b4f</link>
+				<description>i&#39;m using cakephp to construct a logical data model array that will be &lt;br&gt; passed to a flex app. I have the following model association: &lt;br&gt; ServiceDay-&amp;gt;(hasMany)ServiceTi me-&amp;gt;(hasMany)ServiceTimePrice. So what &lt;br&gt; the current output from my findall is something like this example: &lt;br&gt; &lt;p&gt;Array( &lt;br&gt; [0] =&amp;gt; Array(</description>
+				<guid isPermaLink="true">http://groups.google.com/group/cake-php/msg/49bc00f3bc651b4f</guid>
+				<author>bmil...@gmail.com(bpscrugs)</author>
+				<pubDate>Fri, 28 Dec 2007 00:44:14 UT</pubDate>
+				</item>
+				<item>
+				<title>Re: share views between actions?</title>
+				<link>http://groups.google.com/group/cake-php/msg/8b350d898707dad8</link>
+				<description>Then perhaps you might do us all a favour and refrain from replying to &lt;br&gt; things you do not understand. That goes especially for asinine comments. &lt;br&gt; Indeed. &lt;br&gt; To sum up: &lt;br&gt; No comment. &lt;br&gt; In my day, a simple &amp;quot;RTFM&amp;quot; would suffice. I&#39;ll keep in mind to ignore any &lt;br&gt; further responses from you. &lt;br&gt; You (and I) were referring to the *online documentation*, not other</description>
+				<guid isPermaLink="true">http://groups.google.com/group/cake-php/msg/8b350d898707dad8</guid>
+				<author>subtropolis.z...@gmail.com(subtropolis zijn)</author>
+				<pubDate>Fri, 28 Dec 2007 00:45:01 UT</pubDate>
 			 </item>
 		</channel>
 		</rss>';
@@ -2908,7 +2909,7 @@ class SetTest extends CakeTestCase {
 				'item' => array(
 					'@attr' => '123',
 					'titles' => 'list',
-					'@'  => 'textforitems'
+					'@' => 'textforitems'
 				)
 			)
 		);
@@ -2916,32 +2917,32 @@ class SetTest extends CakeTestCase {
 
 		$string = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 		<rss version="2.0" xmlns:dc="http://www.cakephp.org/">
-		  <channel>
-		  <title>Cake PHP Google Group</title>
-		  <link>http://groups.google.com/group/cake-php</link>
-		  <description>Search this group before posting anything. There are over 20,000 posts and it&amp;#39;s very likely your question was answered before. Visit the IRC channel #cakephp at irc.freenode.net for live chat with users and developers of Cake. If you post, tell us the version of Cake, PHP, and database.</description>
-		  <language>en</language>
-		  	<item>
-			  <title>constructng result array when using findall</title>
-			  <link>http://groups.google.com/group/cake-php/msg/49bc00f3bc651b4f</link>
-			  <description>i&#39;m using cakephp to construct a logical data model array that will be &lt;br&gt; passed to a flex app. I have the following model association: &lt;br&gt; ServiceDay-&amp;gt;(hasMany)ServiceTi me-&amp;gt;(hasMany)ServiceTimePrice. So what &lt;br&gt; the current output from my findall is something like this example: &lt;br&gt; &lt;p&gt;Array( &lt;br&gt; [0] =&amp;gt; Array(</description>
-			  	<dc:creator>cakephp</dc:creator>
+			<channel>
+			<title>Cake PHP Google Group</title>
+			<link>http://groups.google.com/group/cake-php</link>
+			<description>Search this group before posting anything. There are over 20,000 posts and it&amp;#39;s very likely your question was answered before. Visit the IRC channel #cakephp at irc.freenode.net for live chat with users and developers of Cake. If you post, tell us the version of Cake, PHP, and database.</description>
+			<language>en</language>
+				<item>
+				<title>constructng result array when using findall</title>
+				<link>http://groups.google.com/group/cake-php/msg/49bc00f3bc651b4f</link>
+				<description>i&#39;m using cakephp to construct a logical data model array that will be &lt;br&gt; passed to a flex app. I have the following model association: &lt;br&gt; ServiceDay-&amp;gt;(hasMany)ServiceTi me-&amp;gt;(hasMany)ServiceTimePrice. So what &lt;br&gt; the current output from my findall is something like this example: &lt;br&gt; &lt;p&gt;Array( &lt;br&gt; [0] =&amp;gt; Array(</description>
+					<dc:creator>cakephp</dc:creator>
 				<category><![CDATA[cakephp]]></category>
 				<category><![CDATA[model]]></category>
-			  <guid isPermaLink="true">http://groups.google.com/group/cake-php/msg/49bc00f3bc651b4f</guid>
-			  <author>bmil...@gmail.com(bpscrugs)</author>
-			  <pubDate>Fri, 28 Dec 2007 00:44:14 UT</pubDate>
-			  </item>
-			  <item>
-			  <title>Re: share views between actions?</title>
-			  <link>http://groups.google.com/group/cake-php/msg/8b350d898707dad8</link>
-			  <description>Then perhaps you might do us all a favour and refrain from replying to &lt;br&gt; things you do not understand. That goes especially for asinine comments. &lt;br&gt; Indeed. &lt;br&gt; To sum up: &lt;br&gt; No comment. &lt;br&gt; In my day, a simple &amp;quot;RTFM&amp;quot; would suffice. I&#39;ll keep in mind to ignore any &lt;br&gt; further responses from you. &lt;br&gt; You (and I) were referring to the *online documentation*, not other</description>
-			  	<dc:creator>cakephp</dc:creator>
+				<guid isPermaLink="true">http://groups.google.com/group/cake-php/msg/49bc00f3bc651b4f</guid>
+				<author>bmil...@gmail.com(bpscrugs)</author>
+				<pubDate>Fri, 28 Dec 2007 00:44:14 UT</pubDate>
+				</item>
+				<item>
+				<title>Re: share views between actions?</title>
+				<link>http://groups.google.com/group/cake-php/msg/8b350d898707dad8</link>
+				<description>Then perhaps you might do us all a favour and refrain from replying to &lt;br&gt; things you do not understand. That goes especially for asinine comments. &lt;br&gt; Indeed. &lt;br&gt; To sum up: &lt;br&gt; No comment. &lt;br&gt; In my day, a simple &amp;quot;RTFM&amp;quot; would suffice. I&#39;ll keep in mind to ignore any &lt;br&gt; further responses from you. &lt;br&gt; You (and I) were referring to the *online documentation*, not other</description>
+					<dc:creator>cakephp</dc:creator>
 				<category><![CDATA[cakephp]]></category>
 				<category><![CDATA[model]]></category>
-			  <guid isPermaLink="true">http://groups.google.com/group/cake-php/msg/8b350d898707dad8</guid>
-			  <author>subtropolis.z...@gmail.com(subtropolis zijn)</author>
-			  <pubDate>Fri, 28 Dec 2007 00:45:01 UT</pubDate>
+				<guid isPermaLink="true">http://groups.google.com/group/cake-php/msg/8b350d898707dad8</guid>
+				<author>subtropolis.z...@gmail.com(subtropolis zijn)</author>
+				<pubDate>Fri, 28 Dec 2007 00:45:01 UT</pubDate>
 			 </item>
 		</channel>
 		</rss>';
@@ -3135,5 +3136,421 @@ class SetTest extends CakeTestCase {
 		$result = Set::normalize(array('one' => array('a', 'b', 'c' => 'cee'), 'two' => 2, 'three'));
 		$expected = array('one' => array('a', 'b', 'c' => 'cee'), 'two' => 2, 'three' => null);
 		$this->assertEquals($expected, $result);
+	}
+
+/**
+ * test Set nest with a normal model result set. For kicks rely on Set nest detecting the key names
+ * automatically
+ *
+ * @return void
+ */
+	public function testNestModel() {
+		$input = array(
+			array(
+				'ModelName' => array(
+					'id' => 1,
+					'parent_id' => null
+				),
+			),
+			array(
+				'ModelName' => array(
+					'id' => 2,
+					'parent_id' => 1
+				),
+			),
+			array(
+				'ModelName' => array(
+					'id' => 3,
+					'parent_id' => 1
+				),
+			),
+			array(
+				'ModelName' => array(
+					'id' => 4,
+					'parent_id' => 1
+				),
+			),
+			array(
+				'ModelName' => array(
+					'id' => 5,
+					'parent_id' => 1
+				),
+			),
+			array(
+				'ModelName' => array(
+					'id' => 6,
+					'parent_id' => null
+				),
+			),
+			array(
+				'ModelName' => array(
+					'id' => 7,
+					'parent_id' => 6
+				),
+			),
+			array(
+				'ModelName' => array(
+					'id' => 8,
+					'parent_id' => 6
+				),
+			),
+			array(
+				'ModelName' => array(
+					'id' => 9,
+					'parent_id' => 6
+				),
+			),
+			array(
+				'ModelName' => array(
+					'id' => 10,
+					'parent_id' => 6
+				)
+			)
+		);
+		$expected = array(
+			array(
+				'ModelName' => array(
+					'id' => 1,
+					'parent_id' => null
+				),
+				'children' => array(
+					array(
+						'ModelName' => array(
+							'id' => 2,
+							'parent_id' => 1
+						),
+						'children' => array()
+					),
+					array(
+						'ModelName' => array(
+							'id' => 3,
+							'parent_id' => 1
+						),
+						'children' => array()
+					),
+					array(
+						'ModelName' => array(
+							'id' => 4,
+							'parent_id' => 1
+						),
+						'children' => array()
+					),
+					array(
+						'ModelName' => array(
+							'id' => 5,
+							'parent_id' => 1
+						),
+						'children' => array()
+					),
+
+				)
+			),
+			array(
+				'ModelName' => array(
+					'id' => 6,
+					'parent_id' => null
+				),
+				'children' => array(
+					array(
+						'ModelName' => array(
+							'id' => 7,
+							'parent_id' => 6
+						),
+						'children' => array()
+					),
+					array(
+						'ModelName' => array(
+							'id' => 8,
+							'parent_id' => 6
+						),
+						'children' => array()
+					),
+					array(
+						'ModelName' => array(
+							'id' => 9,
+							'parent_id' => 6
+						),
+						'children' => array()
+					),
+					array(
+						'ModelName' => array(
+							'id' => 10,
+							'parent_id' => 6
+						),
+						'children' => array()
+					)
+				)
+			)
+		);
+		$result = Set::nest($input);
+		$this->assertEquals($expected, $result);
+	}
+
+/**
+ * test Set nest with a normal model result set, and a nominated root id
+ *
+ * @return void
+ */
+	public function testNestModelExplicitRoot() {
+		$input = array(
+			array(
+				'ModelName' => array(
+					'id' => 1,
+					'parent_id' => null
+				),
+			),
+			array(
+				'ModelName' => array(
+					'id' => 2,
+					'parent_id' => 1
+				),
+			),
+			array(
+				'ModelName' => array(
+					'id' => 3,
+					'parent_id' => 1
+				),
+			),
+			array(
+				'ModelName' => array(
+					'id' => 4,
+					'parent_id' => 1
+				),
+			),
+			array(
+				'ModelName' => array(
+					'id' => 5,
+					'parent_id' => 1
+				),
+			),
+			array(
+				'ModelName' => array(
+					'id' => 6,
+					'parent_id' => null
+				),
+			),
+			array(
+				'ModelName' => array(
+					'id' => 7,
+					'parent_id' => 6
+				),
+			),
+			array(
+				'ModelName' => array(
+					'id' => 8,
+					'parent_id' => 6
+				),
+			),
+			array(
+				'ModelName' => array(
+					'id' => 9,
+					'parent_id' => 6
+				),
+			),
+			array(
+				'ModelName' => array(
+					'id' => 10,
+					'parent_id' => 6
+				)
+			)
+		);
+		$expected = array(
+			array(
+				'ModelName' => array(
+					'id' => 6,
+					'parent_id' => null
+				),
+				'children' => array(
+					array(
+						'ModelName' => array(
+							'id' => 7,
+							'parent_id' => 6
+						),
+						'children' => array()
+					),
+					array(
+						'ModelName' => array(
+							'id' => 8,
+							'parent_id' => 6
+						),
+						'children' => array()
+					),
+					array(
+						'ModelName' => array(
+							'id' => 9,
+							'parent_id' => 6
+						),
+						'children' => array()
+					),
+					array(
+						'ModelName' => array(
+							'id' => 10,
+							'parent_id' => 6
+						),
+						'children' => array()
+					)
+				)
+			)
+		);
+		$result = Set::nest($input, array('root' => 6));
+		$this->assertEquals($expected, $result);
+	}
+
+/**
+ * test Set nest with a 1d array - this method should be able to handle any type of array input
+ *
+ * @return void
+ */
+	public function testNest1Dimensional() {
+		$input = array(
+			array(
+				'id' => 1,
+				'parent_id' => null
+			),
+			array(
+				'id' => 2,
+				'parent_id' => 1
+			),
+			array(
+				'id' => 3,
+				'parent_id' => 1
+			),
+			array(
+				'id' => 4,
+				'parent_id' => 1
+			),
+			array(
+				'id' => 5,
+				'parent_id' => 1
+			),
+			array(
+				'id' => 6,
+				'parent_id' => null
+			),
+			array(
+				'id' => 7,
+				'parent_id' => 6
+			),
+			array(
+				'id' => 8,
+				'parent_id' => 6
+			),
+			array(
+				'id' => 9,
+				'parent_id' => 6
+			),
+			array(
+				'id' => 10,
+				'parent_id' => 6
+			)
+		);
+		$expected = array(
+			array(
+				'id' => 1,
+				'parent_id' => null,
+				'children' => array(
+					array(
+						'id' => 2,
+						'parent_id' => 1,
+						'children' => array()
+					),
+					array(
+						'id' => 3,
+						'parent_id' => 1,
+						'children' => array()
+					),
+					array(
+						'id' => 4,
+						'parent_id' => 1,
+						'children' => array()
+					),
+					array(
+						'id' => 5,
+						'parent_id' => 1,
+						'children' => array()
+					),
+
+				)
+			),
+			array(
+				'id' => 6,
+				'parent_id' => null,
+				'children' => array(
+					array(
+						'id' => 7,
+						'parent_id' => 6,
+						'children' => array()
+					),
+					array(
+						'id' => 8,
+						'parent_id' => 6,
+						'children' => array()
+					),
+					array(
+						'id' => 9,
+						'parent_id' => 6,
+						'children' => array()
+					),
+					array(
+						'id' => 10,
+						'parent_id' => 6,
+						'children' => array()
+					)
+				)
+			)
+		);
+		$result = Set::nest($input, array('idPath' => '/id', 'parentPath' => '/parent_id'));
+		$this->assertEquals($expected, $result);
+	}
+
+/**
+ * test Set nest with no specified parent data.
+ *
+ * The result should be the same as the input.
+ * For an easier comparison, unset all the empty children arrays from the result
+ *
+ * @return void
+ */
+	public function testMissingParent() {
+		$input = array(
+			array(
+				'id' => 1,
+			),
+			array(
+				'id' => 2,
+			),
+			array(
+				'id' => 3,
+			),
+			array(
+				'id' => 4,
+			),
+			array(
+				'id' => 5,
+			),
+			array(
+				'id' => 6,
+			),
+			array(
+				'id' => 7,
+			),
+			array(
+				'id' => 8,
+			),
+			array(
+				'id' => 9,
+			),
+			array(
+				'id' => 10,
+			)
+		);
+
+		$result = Set::nest($input, array('idPath' => '/id', 'parentPath' => '/parent_id'));
+		foreach($result as &$row) {
+			if (empty($row['children'])) {
+				unset($row['children']);
+			}
+		}
+		$this->assertEquals($input, $result);
 	}
 }

@@ -79,7 +79,9 @@ class String {
 			$node = crc32(Configure::read('Security.salt'));
 		}
 
-		if (function_exists('zend_thread_id')) {
+		if (function_exists('hphp_get_thread_id')) {
+			$pid = hphp_get_thread_id();
+		} else if (function_exists('zend_thread_id')) {
 			$pid = zend_thread_id();
 		} else {
 			$pid = getmypid();
@@ -247,7 +249,7 @@ class String {
 		}
 
 		if (!isset($options['format']) && isset($options['before'])) {
-			$str = str_replace($options['escape'].$options['before'], $options['before'], $str);
+			$str = str_replace($options['escape'] . $options['before'], $options['before'], $str);
 		}
 		return ($options['clean']) ? String::cleanInsert($str, $options) : $str;
 	}

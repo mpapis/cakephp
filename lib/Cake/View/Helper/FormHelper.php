@@ -737,8 +737,48 @@ class FormHelper extends AppHelper {
  * Returns a formatted LABEL element for HTML FORMs. Will automatically generate
  * a for attribute if one is not provided.
  *
+ * ### Options
+ *
+ * - `for` - Set the for attribute, if its not defined the for attribute 
+ *   will be generated from the $fieldName parameter using
+ *   FormHelper::domId().
+ *
+ * Examples:
+ *
+ * The text and for attribute are generated off of the fieldname
+ *
+ * {{{
+ * echo $this->Form->label('Post.published');
+ * <label for="PostPublished">Published</label>
+ * }}}
+ *
+ * Custom text:
+ *
+ * {{{
+ * echo $this->Form->label('Post.published', 'Publish');
+ * <label for="PostPublished">Publish</label>
+ * }}}
+ *
+ * Custom class name:
+ *
+ * {{{
+ * echo $this->Form->label('Post.published', 'Publish', 'required');
+ * <label for="PostPublished" class="required">Publish</label>
+ * }}}
+ *
+ * Custom attributes:
+ *
+ * {{{
+ * echo $this->Form->label('Post.published', 'Publish', array(
+ *		'for' => 'post-publish'
+ * ));
+ * <label for="post-publish">Publish</label>
+ * }}}
+ *
  * @param string $fieldName This should be "Modelname.fieldname"
- * @param string $text Text that will appear in the label field.
+ * @param string $text Text that will appear in the label field.  If 
+ *   $text is left undefined the text will be inflected from the 
+ *   fieldName.
  * @param mixed $options An array of HTML attributes, or a string, to be used as a class name.
  * @return string The formatted LABEL element
  * @link http://book.cakephp.org/2.0/en/core-libraries/helpers/form.html#FormHelper::label
@@ -1070,6 +1110,10 @@ class FormHelper extends AppHelper {
 				$format = $format ? $format : array('before', 'input', 'between', 'label', 'after', 'error');
 			break;
 			case 'radio':
+				if (isset($out['between'])) {
+					$options['between'] = $out['between'];
+					$out['between'] = null;
+				}
 				$input = $this->radio($fieldName, $radioOptions, $options);
 			break;
 			case 'file':
@@ -1145,29 +1189,52 @@ class FormHelper extends AppHelper {
 /**
  * Generate a label for an input() call.
  *
+ * $options can contain a hash of id overrides.  These overrides will be
+ * used instead of the generated values if present.
+ *
  * @param string $fieldName
  * @param string $label
  * @param array $options Options for the label element.
  * @return string Generated label element
+ * @deprecated 'NONE' option is deprecated and will be removed in 3.0
  */
 	protected function _inputLabel($fieldName, $label, $options) {
 		$labelAttributes = $this->domId(array(), 'for');
+		$idKey = null;
 		if ($options['type'] === 'date' || $options['type'] === 'datetime') {
-			if (isset($options['dateFormat']) && $options['dateFormat'] === 'NONE') {
-				$labelAttributes['for'] .= 'Hour';
-				$idKey = 'hour';
-			} else {
-				$labelAttributes['for'] .= 'Month';
-				$idKey = 'month';
+			$firstInput = 'M';
+			if (
+				array_key_exists('dateFormat', $options) &&
+				($options['dateFormat'] === null || $options['dateFormat'] === 'NONE')
+			) {
+				$firstInput = 'H';
+			} elseif (!empty($options['dateFormat'])) {
+				$firstInput = substr($options['dateFormat'], 0, 1);
 			}
-			if (isset($options['id']) && isset($options['id'][$idKey])) {
-				$labelAttributes['for'] = $options['id'][$idKey];
+			switch ($firstInput) {
+				case 'D':
+					$idKey = 'day';
+					$labelAttributes['for'] .= 'Day';
+					break;
+				case 'Y':
+					$idKey = 'year';
+					$labelAttributes['for'] .= 'Year';
+					break;
+				case 'M':
+					$idKey = 'month';
+					$labelAttributes['for'] .= 'Month';
+					break;
+				case 'H':
+					$idKey = 'hour';
+					$labelAttributes['for'] .= 'Hour';
 			}
-		} elseif ($options['type'] === 'time') {
+		}
+		if ($options['type'] === 'time') {
 			$labelAttributes['for'] .= 'Hour';
-			if (isset($options['id']) && isset($options['id']['hour'])) {
-				$labelAttributes['for'] = $options['id']['hour'];
-			}
+			$idKey = 'hour';
+		}
+		if (isset($idKey) && isset($options['id']) && isset($options['id'][$idKey])) {
+			$labelAttributes['for'] = $options['id'][$idKey];
 		}
 
 		if (is_array($label)) {
@@ -1228,8 +1295,10 @@ class FormHelper extends AppHelper {
 		}
 		if ($options['hiddenField']) {
 			$hiddenOptions = array(
-				'id' => $options['id'] . '_', 'name' => $options['name'],
-				'value' => '0', 'secure' => false
+				'id' => $options['id'] . '_',
+				'name' => $options['name'],
+				'value' => ($options['hiddenField'] !== true ? $options['hiddenField'] : '0'),
+				'secure' => false
 			);
 			if (isset($options['disabled']) && $options['disabled'] == true) {
 				$hiddenOptions['disabled'] = 'disabled';
@@ -1248,6 +1317,7 @@ class FormHelper extends AppHelper {
  * ### Attributes:
  *
  * - `separator` - define the string in between the radio buttons
+ * - `between` - the string between legend and input set
  * - `legend` - control whether or not the widget set has a fieldset & legend
  * - `value` - indicate a value that is should be checked
  * - `label` - boolean to indicate whether or not labels for widgets show be displayed
@@ -1262,34 +1332,41 @@ class FormHelper extends AppHelper {
  */
 	public function radio($fieldName, $options = array(), $attributes = array()) {
 		$attributes = $this->_initInputField($fieldName, $attributes);
-		$legend = false;
-		$disabled = array();
 
+		$legend = false;
 		if (isset($attributes['legend'])) {
 			$legend = $attributes['legend'];
 			unset($attributes['legend']);
 		} elseif (count($options) > 1) {
 			$legend = __(Inflector::humanize($this->field()));
 		}
-		$label = true;
 
+		$label = true;
 		if (isset($attributes['label'])) {
 			$label = $attributes['label'];
 			unset($attributes['label']);
 		}
-		$inbetween = null;
 
+		$separator = null;
 		if (isset($attributes['separator'])) {
-			$inbetween = $attributes['separator'];
+			$separator = $attributes['separator'];
 			unset($attributes['separator']);
 		}
 
+		$between = null;
+		if (isset($attributes['between'])) {
+			$between = $attributes['between'];
+			unset($attributes['between']);
+		}
+
+		$value = null;
 		if (isset($attributes['value'])) {
 			$value = $attributes['value'];
 		} else {
-			$value =  $this->value($fieldName);
+			$value = $this->value($fieldName);
 		}
 
+		$disabled = array();
 		if (isset($attributes['disabled'])) {
 			$disabled = $attributes['disabled'];
 		}
@@ -1330,10 +1407,10 @@ class FormHelper extends AppHelper {
 				));
 			}
 		}
-		$out = $hidden . implode($inbetween, $out);
+		$out = $hidden . implode($separator, $out);
 
 		if ($legend) {
-			$out = $this->Html->useTag('fieldset', '', $this->Html->useTag('legend', $legend) . $out);
+			$out = $this->Html->useTag('fieldset', '', $this->Html->useTag('legend', $legend) . $between . $out);
 		}
 		return $out;
 	}
@@ -1756,10 +1833,6 @@ class FormHelper extends AppHelper {
 			unset($attributes['type']);
 		}
 
-		if (!isset($selected)) {
-			$selected = $attributes['value'];
-		}
-
 		if (!empty($attributes['multiple'])) {
 			$style = ($attributes['multiple'] === 'checkbox') ? 'checkbox' : null;
 			$template = ($style) ? 'checkboxmultiplestart' : 'selectmultiplestart';
@@ -2089,8 +2162,8 @@ class FormHelper extends AppHelper {
  *   matching the field name will override this value.  If no default is provided `time()` will be used.
  *
  * @param string $fieldName Prefix name for the SELECT element
- * @param string $dateFormat DMY, MDY, YMD.
- * @param string $timeFormat 12, 24.
+ * @param string $dateFormat DMY, MDY, YMD, or null to not generate date inputs.
+ * @param string $timeFormat 12, 24, or null to not generate time inputs.
  * @param string $attributes array of Attributes
  * @return string Generated set of select boxes for the date and time formats chosen.
  * @link http://book.cakephp.org/2.0/en/core-libraries/helpers/form.html#FormHelper::dateTime
@@ -2461,17 +2534,9 @@ class FormHelper extends AppHelper {
 			case 'year':
 				$current = intval(date('Y'));
 
-				if (!isset($options['min'])) {
-					$min = $current - 20;
-				} else {
-					$min = $options['min'];
-				}
+				$min = !isset($options['min']) ? $current - 20 : (int)$options['min'];
+				$max = !isset($options['max']) ? $current + 20 : (int)$options['max'];
 
-				if (!isset($options['max'])) {
-					$max = $current + 20;
-				} else {
-					$max = $options['max'];
-				}
 				if ($min > $max) {
 					list($min, $max) = array($max, $min);
 				}
@@ -2509,6 +2574,9 @@ class FormHelper extends AppHelper {
 		}
 
 		$result = parent::_initInputField($field, $options);
+		if ($this->tagIsInvalid() !== false) {
+			$result = $this->addClass($result, 'form-error');
+		}
 		if (!empty($result['disabled']) || $secure === self::SECURE_SKIP) {
 			return $result;
 		}

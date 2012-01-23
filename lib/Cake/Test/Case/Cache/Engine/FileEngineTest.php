@@ -45,7 +45,7 @@ class FileEngineTest extends CakeTestCase {
 	}
 
 /**
- * teardown method
+ * tearDown method
  *
  * @return void
  */
@@ -356,12 +356,15 @@ class FileEngineTest extends CakeTestCase {
  * @return void
  */
 	public function testMaskSetting() {
+		if (DS === '\\') {
+			$this->markTestSkipped('File permission testing does not work on Windows.');
+		}
 		Cache::config('mask_test', array('engine' => 'File', 'path' => TMP . 'tests'));
 		$data = 'This is some test content';
 		$write = Cache::write('masking_test', $data, 'mask_test');
 		$result = substr(sprintf('%o',fileperms(TMP . 'tests' . DS .'cake_masking_test')), -4);
 		$expected = '0664';
-		$this->assertEquals($result, $expected);
+		$this->assertEquals($expected, $result);
 		Cache::delete('masking_test', 'mask_test');
 		Cache::drop('mask_test');
 
@@ -369,7 +372,7 @@ class FileEngineTest extends CakeTestCase {
 		$write = Cache::write('masking_test', $data, 'mask_test');
 		$result = substr(sprintf('%o',fileperms(TMP . 'tests' . DS .'cake_masking_test')), -4);
 		$expected = '0666';
-		$this->assertEquals($result, $expected);
+		$this->assertEquals($expected, $result);
 		Cache::delete('masking_test', 'mask_test');
 		Cache::drop('mask_test');
 
@@ -377,7 +380,7 @@ class FileEngineTest extends CakeTestCase {
 		$write = Cache::write('masking_test', $data, 'mask_test');
 		$result = substr(sprintf('%o',fileperms(TMP . 'tests' . DS .'cake_masking_test')), -4);
 		$expected = '0644';
-		$this->assertEquals($result, $expected);
+		$this->assertEquals($expected, $result);
 		Cache::delete('masking_test', 'mask_test');
 		Cache::drop('mask_test');
 
@@ -385,7 +388,7 @@ class FileEngineTest extends CakeTestCase {
 		$write = Cache::write('masking_test', $data, 'mask_test');
 		$result = substr(sprintf('%o',fileperms(TMP . 'tests' . DS .'cake_masking_test')), -4);
 		$expected = '0640';
-		$this->assertEquals($result, $expected);
+		$this->assertEquals($expected, $result);
 		Cache::delete('masking_test', 'mask_test');
 		Cache::drop('mask_test');
 	}

@@ -20,8 +20,9 @@
  */
 
 /**
- * Behavior to allow for dynamic and atomic manipulation of a Model's associations used for a find call. Most useful for limiting
- * the amount of associations and data returned.
+ * Behavior to allow for dynamic and atomic manipulation of a Model's associations 
+ * used for a find call. Most useful for limiting the amount of associations and 
+ * data returned.
  *
  * @package       Cake.Model.Behavior
  * @link http://book.cakephp.org/2.0/en/core-libraries/behaviors/containable.html
@@ -307,10 +308,10 @@ class ContainableBehavior extends ModelBehavior {
 						$val = preg_split('/\s*,\s*/', substr(substr($key, 1), 0, -1));
 					} elseif (preg_match('/ASC|DESC$/', $key)) {
 						$option = 'order';
-						$val = $Model->{$name}->alias.'.'.$key;
+						$val = $Model->{$name}->alias . '.' . $key;
 					} elseif (preg_match('/[ =!]/', $key)) {
 						$option = 'conditions';
-						$val = $Model->{$name}->alias.'.'.$key;
+						$val = $Model->{$name}->alias . '.' . $key;
 					}
 					$children[$option] = is_array($val) ? $val : array($val);
 					$newChildren = null;

@@ -18,6 +18,7 @@
  */
 
 App::uses('ObjectCollection', 'Utility');
+App::uses('CakeEvent', 'Event');
 
 /**
  * A generic object class
@@ -91,21 +92,23 @@ class GenericObjectCollection extends ObjectCollection {
 
 class ObjectCollectionTest extends CakeTestCase {
 /**
- * setup
+ * setUp
  *
  * @return void
  */
-	public function setup() {
+	public function setUp() {
+		parent::setUp();
 		$this->Objects = new GenericObjectCollection();
 	}
 
 /**
- * teardown
+ * tearDown
  *
  * @return void
  */
-	public function teardown() {
+	public function tearDown() {
 		unset($this->Objects);
+		parent::tearDown();
 	}
 
 /**
@@ -522,5 +525,60 @@ class ObjectCollectionTest extends CakeTestCase {
 		$result = ObjectCollection::normalizeObjectArray($components);
 		$this->assertEquals($expected, $result);
 	}
+	
+/**
+ * tests that passing an instance of CakeEvent to trigger will prepend the subject to the list of arguments
+ *
+ * @return void
+ */
+	public function testDispatchEventWithSubject() {
+		$this->_makeMockClasses();
+		$this->Objects->load('TriggerMockFirst');
+		$this->Objects->load('TriggerMockSecond');
 
+		$this->mockObjects[] = $this->Objects->TriggerMockFirst;
+		$this->mockObjects[] = $this->Objects->TriggerMockSecond;
+
+		$subjectClass = new Object();
+		$this->Objects->TriggerMockFirst->expects($this->once())
+			->method('callback')
+			->with($subjectClass, 'first argument')
+			->will($this->returnValue(true));
+		$this->Objects->TriggerMockSecond->expects($this->once())
+			->method('callback')
+			->with($subjectClass, 'first argument')
+			->will($this->returnValue(true));
+
+		$event = new CakeEvent('callback', $subjectClass, array('first argument'));
+		$this->assertTrue($this->Objects->trigger($event));
+	}
+
+/**
+ * tests that passing an instance of CakeEvent to trigger with omitSubject property
+ * will NOT prepend the subject to the list of arguments
+ *
+ * @return void
+ */
+	public function testDispatchEventNoSubject() {
+		$this->_makeMockClasses();
+		$this->Objects->load('TriggerMockFirst');
+		$this->Objects->load('TriggerMockSecond');
+
+		$this->mockObjects[] = $this->Objects->TriggerMockFirst;
+		$this->mockObjects[] = $this->Objects->TriggerMockSecond;
+
+		$subjectClass = new Object();
+		$this->Objects->TriggerMockFirst->expects($this->once())
+			->method('callback')
+			->with('first argument')
+			->will($this->returnValue(true));
+		$this->Objects->TriggerMockSecond->expects($this->once())
+			->method('callback')
+			->with('first argument')
+			->will($this->returnValue(true));
+
+		$event = new CakeEvent('callback', $subjectClass, array('first argument'));
+		$event->omitSubject = true;
+		$this->assertTrue($this->Objects->trigger($event));
+	}
 }

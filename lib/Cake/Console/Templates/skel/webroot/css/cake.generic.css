@@ -1,3 +1,4 @@
+@charset "utf-8";
 /**
  *
  * Generic CSS for CakePHP
@@ -365,6 +366,7 @@ form .submit input[type=submit] {
 form .submit input[type=submit]:hover {
 	background: #5BA150;
 }
+
 /* Form errors */
 form .error {
 	background: #FFDACC;
@@ -646,6 +648,7 @@ pre {
 	overflow: auto;
 	text-shadow: none;
 }
+
 /* excerpt */
 .cake-code-dump pre,
 .cake-code-dump pre code {

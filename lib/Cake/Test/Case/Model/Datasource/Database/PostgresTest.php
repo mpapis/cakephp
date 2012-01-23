@@ -206,6 +206,7 @@ class PostgresTest extends CakeTestCase {
 		'core.tag', 'core.articles_tag', 'core.attachment', 'core.person', 'core.post', 'core.author',
 		'core.datatype',
 	);
+
 /**
  * Actual DB connection used in testing
  *
@@ -284,10 +285,10 @@ class PostgresTest extends CakeTestCase {
 		$result = $this->Dbo->fields($this->model, null, array('*', 'PostgresClientTestModel.*'));
 		$expected = array_merge($fields, array(
 			'"PostgresClientTestModel"."id" AS "PostgresClientTestModel__id"',
-    		'"PostgresClientTestModel"."name" AS "PostgresClientTestModel__name"',
-    		'"PostgresClientTestModel"."email" AS "PostgresClientTestModel__email"',
-    		'"PostgresClientTestModel"."created" AS "PostgresClientTestModel__created"',
-    		'"PostgresClientTestModel"."updated" AS "PostgresClientTestModel__updated"'));
+			'"PostgresClientTestModel"."name" AS "PostgresClientTestModel__name"',
+			'"PostgresClientTestModel"."email" AS "PostgresClientTestModel__email"',
+			'"PostgresClientTestModel"."created" AS "PostgresClientTestModel__created"',
+			'"PostgresClientTestModel"."updated" AS "PostgresClientTestModel__updated"'));
 		$this->assertEquals($expected, $result);
 	}
 
@@ -758,7 +759,7 @@ class PostgresTest extends CakeTestCase {
  */
 	function testVirtualFieldAsAConstant() {
 		$this->loadFixtures('Article', 'Comment');
-		$Article =& ClassRegistry::init('Article');
+		$Article = ClassRegistry::init('Article');
 		$Article->virtualFields = array(
 			'empty' => "NULL",
 			'number' => 43,
@@ -870,4 +871,38 @@ class PostgresTest extends CakeTestCase {
 		$result = $this->Dbo->getEncoding();
 		$this->assertEquals('EUC-JP', $result) ;
 	}
+
+/**
+ * Test truncate with a mock.
+ *
+ * @return void
+ */
+	public function testTruncateStatements() {
+		$this->loadFixtures('Article', 'User');
+		$db = ConnectionManager::getDatasource('test');
+		$schema = $db->config['schema'];
+		$Article = new Article();
+
+		$this->Dbo = $this->getMock('Postgres', array('execute'), array($db->config));
+
+		$this->Dbo->expects($this->at(0))->method('execute')
+			->with("DELETE FROM \"$schema\".\"articles\"");
+		$this->Dbo->truncate($Article);
+
+		$this->Dbo->expects($this->at(0))->method('execute')
+			->with("DELETE FROM \"$schema\".\"articles\"");
+		$this->Dbo->truncate('articles');
+
+		// #2355: prevent duplicate prefix
+		$this->Dbo->config['prefix'] = 'tbl_';
+		$Article->tablePrefix = 'tbl_';
+		$this->Dbo->expects($this->at(0))->method('execute')
+			->with("DELETE FROM \"$schema\".\"tbl_articles\"");
+		$this->Dbo->truncate($Article);
+
+		$this->Dbo->expects($this->at(0))->method('execute')
+			->with("DELETE FROM \"$schema\".\"tbl_articles\"");
+		$this->Dbo->truncate('articles');
+	}
+
 }

@@ -21,7 +21,11 @@
  */
 
 /**
- * File Storage engine for cache
+ * File Storage engine for cache.  Filestorage is the slowest cache storage
+ * to read and write.  However, it is good for servers that don't have other storage
+ * engine available, or have content which is not performance sensitive.
+ *
+ * You can configure a FileEngine cache, using Cache::config()
  *
  * @package       Cake.Cache.Engine
  */
@@ -125,14 +129,14 @@ class FileEngine extends CacheEngine {
 		$contents = $expires . $lineBreak . $data . $lineBreak;
 
 		if ($this->settings['lock']) {
-		    $this->_File->flock(LOCK_EX);
+			$this->_File->flock(LOCK_EX);
 		}
 
 		$this->_File->rewind();
 		$success = $this->_File->ftruncate(0) && $this->_File->fwrite($contents) && $this->_File->fflush();
 
 		if ($this->settings['lock']) {
-		    $this->_File->flock(LOCK_UN);
+			$this->_File->flock(LOCK_UN);
 		}
 
 		return $success;

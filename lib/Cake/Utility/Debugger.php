@@ -19,10 +19,6 @@
  * @license       MIT License (http://www.opensource.org/licenses/mit-license.php)
  */
 
-/**
- * Included libraries.
- *
- */
 App::uses('CakeLog', 'Log');
 App::uses('String', 'Utility');
 
@@ -280,12 +276,12 @@ class Debugger {
 	public static function trace($options = array()) {
 		$_this = Debugger::getInstance();
 		$defaults = array(
-			'depth'   => 999,
-			'format'  => $_this->_outputFormat,
-			'args'    => false,
-			'start'   => 0,
-			'scope'   => null,
-			'exclude' => array('call_user_func_array', 'trigger_error')
+			'depth'		=> 999,
+			'format'	=> $_this->_outputFormat,
+			'args'		=> false,
+			'start'		=> 0,
+			'scope'		=> null,
+			'exclude'	=> array('call_user_func_array', 'trigger_error')
 		);
 		$options = Set::merge($defaults, $options);
 
@@ -406,7 +402,7 @@ class Debugger {
 			if (!isset($data[$i])) {
 				continue;
 			}
-			$string = str_replace(array("\r\n", "\n"), "", highlight_string($data[$i], true));
+			$string = str_replace(array("\r\n", "\n"), "", self::_highlight($data[$i]));
 			if ($i == $line) {
 				$lines[] = '<span class="code-highlight">' . $string . '</span>';
 			} else {
@@ -417,9 +413,26 @@ class Debugger {
 	}
 
 /**
+ * Wraps the highlight_string funciton in case the server API does not
+ * implement the function as it is the case of the HipHop interpreter
+ *
+ * @param string $str the string to convert
+ * @return string
+ */
+	protected static function _highlight($str) {
+		static $supportHighlight = null;
+		if (!$supportHighlight && function_exists('hphp_log')) {
+			$supportHighlight = false;
+			return htmlentities($str);
+		}
+		$supportHighlight = true;
+		return highlight_string($str, true);
+	}
+
+/**
  * Converts a variable to a string for debug output.
  *
- * *Note:* The following keys will have their contents 
+ * *Note:* The following keys will have their contents
  * replaced with `*****`:
  *
  *  - password
@@ -675,7 +688,10 @@ class Debugger {
 		$data += $defaults;
 
 		$files = $this->trace(array('start' => $data['start'], 'format' => 'points'));
-		$code = $this->excerpt($files[0]['file'], $files[0]['line'] - 1, 1);
+		$code = '';
+		if (isset($files[0]['file'])) {
+			$code = $this->excerpt($files[0]['file'], $files[0]['line'] - 1, 1);
+		}
 		$trace = $this->trace(array('start' => $data['start'], 'depth' => '20'));
 		$insertOpts = array('before' => '{:', 'after' => '}');
 		$context = array();
@@ -737,7 +753,7 @@ class Debugger {
  */
 	public static function getType($var) {
 		if (is_object($var)) {
-			return get_class($var); 
+			return get_class($var);
 		}
 		if (is_null($var)) {
 			return 'null';

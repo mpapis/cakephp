@@ -11,6 +11,7 @@
  * @since         CakePHP(tm) v 1.3
  * @license       MIT License (http://www.opensource.org/licenses/mit-license.php)
  */
+
 App::uses('Set', 'Utility');
 
 /**
@@ -184,6 +185,7 @@ class CakeRoute {
 			return false;
 		}
 		foreach ($this->defaults as $key => $val) {
+			$key = (string) $key;
 			if ($key[0] === '[' && preg_match('/^\[(\w+)\]$/', $key, $header)) {
 				if (isset($this->_headerMap[$header[1]])) {
 					$header = $this->_headerMap[$header[1]];

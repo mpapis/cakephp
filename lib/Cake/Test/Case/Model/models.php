@@ -1901,6 +1901,7 @@ class AssociationTest2 extends CakeTestModel {
 class Callback extends CakeTestModel {
 
 }
+
 /**
  * CallbackPostTestModel class
  *
@@ -2510,7 +2511,7 @@ class UnconventionalTree extends NumberTree {
 	public $actsAs = array(
 		'Tree' => array(
 			'parent' => 'join',
-			'left'  => 'left',
+			'left' => 'left',
 			'right' => 'right'
 		)
 	);
@@ -3137,7 +3138,7 @@ class CounterCachePost extends CakeTestModel {
 class CounterCacheUserNonstandardPrimaryKey extends CakeTestModel {
 	public $name = 'CounterCacheUserNonstandardPrimaryKey';
 	public $alias = 'User';
-    public $primaryKey = 'uid';
+	public $primaryKey = 'uid';
 
 	public $hasMany = array('Post' => array(
 		'className' => 'CounterCachePostNonstandardPrimaryKey',
@@ -3148,7 +3149,7 @@ class CounterCacheUserNonstandardPrimaryKey extends CakeTestModel {
 class CounterCachePostNonstandardPrimaryKey extends CakeTestModel {
 	public $name = 'CounterCachePostNonstandardPrimaryKey';
 	public $alias = 'Post';
-    public $primaryKey = 'pid';
+	public $primaryKey = 'pid';
 
 	public $belongsTo = array('User' => array(
 		'className' => 'CounterCacheUserNonstandardPrimaryKey',
@@ -3283,6 +3284,24 @@ class TransactionManyTestModel extends CakeTestModel {
 		);
 		$this->saveMany($data, array('atomic' => true, 'callbacks' => false));
 	}
+}
+
+class Site extends CakeTestModel {
+	var $name = 'Site';
+	var $useTable = 'sites';
+
+	var $hasAndBelongsToMany = array(
+		'Domain' => array('unique' => 'keepExisting'),
+		);
+}
+
+class Domain extends CakeTestModel {
+	var $name = 'Domain';
+	var $useTable = 'domains';
+
+	var $hasAndBelongsToMany = array(
+		'Site' => array('unique' => 'keepExisting'),
+		);
 }
 
 /**
@@ -4479,8 +4498,8 @@ class MysqlTestModel extends Model {
 class PrefixTestModel extends CakeTestModel {
 }
 class PrefixTestUseTableModel extends CakeTestModel {
-       public $name = 'PrefixTest';
-       public $useTable = 'prefix_tests';
+	public $name = 'PrefixTest';
+	public $useTable = 'prefix_tests';
 }
 
 /**

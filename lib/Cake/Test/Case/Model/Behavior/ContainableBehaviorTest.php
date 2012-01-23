@@ -2989,6 +2989,7 @@ class ContainableBehaviorTest extends CakeTestCase {
 		$this->assertFalse(isset($result[0]['Comment']['published']), 'published found %s');
 		$this->assertFalse(isset($result[0]['User']['password']), 'password found %s');
 	}
+
 /**
  * testFindConditionalBinding method
  *
@@ -3568,6 +3569,7 @@ class ContainableBehaviorTest extends CakeTestCase {
 		$this->assertTrue(isset($result[0]['Article']));
 		$this->assertTrue(isset($result[0]['User']));
 	}
+
 /**
  * test that autoFields doesn't splice in columns that aren't part of the join.
  *
@@ -3598,8 +3600,8 @@ class ContainableBehaviorTest extends CakeTestCase {
  * @return void
  */
 	public function testLazyLoad() {
-        // Local set up
-        $this->User = ClassRegistry::init('User');
+		// Local set up
+		$this->User = ClassRegistry::init('User');
 		$this->User->bindModel(array(
 			'hasMany' => array('Article', 'ArticleFeatured', 'Comment')
 		), false);
@@ -3612,7 +3614,7 @@ class ContainableBehaviorTest extends CakeTestCase {
 		} catch (Exception $e) {
 			$exceptions = true;
 		}
-        $this->assertTrue(empty($exceptions));
+		$this->assertTrue(empty($exceptions));
 	}
 
 /**

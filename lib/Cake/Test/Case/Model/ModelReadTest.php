@@ -2987,11 +2987,107 @@ class ModelReadTest extends BaseModelTest {
 		$noAfterFindData = $noAfterFindModel->find('all');
 
 		$this->assertFalse($afterFindModel == $noAfterFindModel);
-		// Limitation of PHP 4 and PHP 5 > 5.1.6 when comparing recursive objects
-		if (PHP_VERSION === '5.1.6') {
-			$this->assertFalse($afterFindModel != $duplicateModel);
-		}
 		$this->assertEquals($afterFindData, $noAfterFindData);
+	}
+
+/**
+ * testFindThreadedNoParent method
+ *
+ * @return void
+ */
+	public function testFindThreadedNoParent() {
+		$this->loadFixtures('Apple', 'Sample');
+		$Apple = new Apple();
+		$result = $Apple->find('threaded');
+		$result = Set::extract($result, '{n}.children');
+		$expected = array(array(), array(), array(), array(), array(), array(),	array());
+		$this->assertEquals($expected, $result);
+	}
+
+/**
+ * testFindThreaded method
+ *
+ * @return void
+ */
+	public function testFindThreaded() {
+		$this->loadFixtures('Person');
+		$Model = new Person();
+		$Model->recursive = -1;
+		$result = $Model->find('threaded');
+		$result = Set::extract($result, '{n}.children');
+		$expected = array(array(), array(), array(), array(), array(), array(),	array());
+		$this->assertEquals($expected, $result);
+
+		$result = $Model->find('threaded', array('parent' => 'mother_id'));
+		$expected = array(
+			array(
+				'Person' => array(
+					'id' => '4',
+					'name' => 'mother - grand mother',
+					'mother_id' => '0',
+					'father_id' => '0'
+				),
+				'children' => array(
+					array(
+						'Person' => array(
+							'id' => '2',
+							'name' => 'mother',
+							'mother_id' => '4',
+							'father_id' => '5'
+						),
+						'children' => array(
+							array(
+								'Person' => array(
+									'id' => '1',
+									'name' => 'person',
+									'mother_id' => '2',
+									'father_id' => '3'
+								),
+								'children' => array()
+							)
+						)
+					)
+				)
+			),
+			array(
+				'Person' => array(
+					'id' => '5',
+					'name' => 'mother - grand father',
+					'mother_id' => '0',
+					'father_id' => '0'
+				),
+				'children' => array()
+			),
+			array(
+				'Person' => array(
+					'id' => '6',
+					'name' => 'father - grand mother',
+					'mother_id' => '0',
+					'father_id' => '0'
+				),
+				'children' => array(
+					array(
+						'Person' => array(
+							'id' => '3',
+							'name' => 'father',
+							'mother_id' => '6',
+							'father_id' => '7'
+						),
+						'children' => array()
+					)
+				)
+			),
+			array(
+				'Person' => array(
+					'id' => '7',
+					'name' => 'father - grand father',
+					'mother_id' => '0',
+					'father_id' => '0'
+				),
+				'children' => array()
+			)
+		);
+		$this->assertEquals($expected, $result);
 	}
 
 /**
@@ -5041,7 +5137,7 @@ class ModelReadTest extends BaseModelTest {
  * @return void
  */
 	public function testCallbackSourceChangeUnknownDatasource() {
-		$this->loadFixtures('Post');
+		$this->loadFixtures('Post', 'Author');
 		$TestModel = new Post();
 		$this->assertFalse($TestModel->find('all', array('connection' => 'foo')));
 	}
@@ -7447,6 +7543,7 @@ class ModelReadTest extends BaseModelTest {
 		);
 		$this->assertEquals($expected, $result);
 	}
+
 /**
  * Testing availability of $this->findQueryType in Model callbacks
  *
@@ -7560,7 +7657,7 @@ class ModelReadTest extends BaseModelTest {
 			'2' => 'Second Post',
 			'1' => 'First Post'
 		);
-		$this->assertEquals($result, $expected);
+		$this->assertEquals($expected, $result);
 
 		$result = $Post->find('list', array('order' => array('Post.other_field' => 'DESC')));
 		$expected = array(
@@ -7568,23 +7665,23 @@ class ModelReadTest extends BaseModelTest {
 			'2' => 'Second Post',
 			'3' => 'Third Post'
 		);
-		$this->assertEquals($result, $expected);
+		$this->assertEquals($expected, $result);
 
 		$Post->Author->virtualFields = array('joined' => 'Post.id * Author.id');
 		$result = $Post->find('all');
 		$result = Set::extract('{n}.Author.joined', $result);
 		$expected = array(1, 6, 3);
-		$this->assertEquals($result, $expected);
+		$this->assertEquals($expected, $result);
 
 		$result = $Post->find('all', array('order' => array('Author.joined' => 'ASC')));
 		$result = Set::extract('{n}.Author.joined', $result);
 		$expected = array(1, 3, 6);
-		$this->assertEquals($result, $expected);
+		$this->assertEquals($expected, $result);
 
 		$result = $Post->find('all', array('order' => array('Author.joined' => 'DESC')));
 		$result = Set::extract('{n}.Author.joined', $result);
 		$expected = array(6, 3, 1);
-		$this->assertEquals($result, $expected);
+		$this->assertEquals($expected, $result);
 	}
 
 /**
@@ -7650,7 +7747,7 @@ class ModelReadTest extends BaseModelTest {
 		$this->loadFixtures('Post', 'Author');
 		$Post = new Post();
 		$Post->virtualFields = array(
-		    'writer' => 'Author.user'
+			'writer' => 'Author.user'
 		);
 		$result = $Post->find('first');
 		$this->assertTrue(isset($result['Post']['writer']), 'virtual field not fetched %s');

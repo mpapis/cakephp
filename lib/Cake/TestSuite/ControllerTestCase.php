@@ -95,7 +95,7 @@ class InterceptContentHelper extends Helper {
  * @param string $viewFile The view file
  */
 	public function afterRender($viewFile) {
-		$this->_View->_viewNoLayout = $this->_View->output;
+		$this->_View->assign('__view_no_layout__', $this->_View->fetch('content'));
 		$this->_View->Helpers->unload('InterceptContent');
 	}
 }
@@ -251,7 +251,7 @@ abstract class ControllerTestCase extends CakeTestCase {
 
 		$plugin = empty($request->params['plugin']) ? '' : Inflector::camelize($request->params['plugin']) . '.';
 		if ($this->controller === null && $this->autoMock) {
-			$this->generate(Inflector::camelize($plugin . $request->params['controller']));
+			$this->generate($plugin . Inflector::camelize($request->params['controller']));
 		}
 		$params = array();
 		if ($options['return'] == 'result') {
@@ -266,7 +266,7 @@ abstract class ControllerTestCase extends CakeTestCase {
 		$this->vars = $this->controller->viewVars;
 		$this->contents = $this->controller->response->body();
 		if (isset($this->controller->View)) {
-			$this->view = $this->controller->View->_viewNoLayout;
+			$this->view = $this->controller->View->fetch('__view_no_layout__');
 		}
 		$this->__dirtyController = true;
 		$this->headers = $Dispatch->response->header();

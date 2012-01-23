@@ -314,7 +314,7 @@ class AuthComponent extends Component {
 			if (!$this->_getUser()) {
 				if (!$request->is('ajax')) {
 					$this->flash($this->authError);
-					$this->Session->write('Auth.redirect', Router::reverse($request));
+					$this->Session->write('Auth.redirect', $request->here());
 					$controller->redirect($loginAction);
 					return false;
 				} elseif (!empty($this->ajaxLogin)) {
@@ -432,7 +432,7 @@ class AuthComponent extends Component {
  */
 	public function allow($action = null) {
 		$args = func_get_args();
-		if (empty($args)) {
+		if (empty($args) || $action === null) {
 			$this->allowedActions = $this->_methods;
 		} else {
 			if (isset($args[0]) && is_array($args[0])) {
@@ -458,7 +458,7 @@ class AuthComponent extends Component {
  */
 	public function deny($action = null) {
 		$args = func_get_args();
-		if (empty($args)) {
+		if (empty($args) || $action === null) {
 			$this->allowedActions = array();
 		} else {
 			if (isset($args[0]) && is_array($args[0])) {

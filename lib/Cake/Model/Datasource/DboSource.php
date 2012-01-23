@@ -484,7 +484,7 @@ class DboSource extends DataSource {
 		if ($this->hasResult()) {
 			return $this->_result->rowCount();
 		}
-		return null;
+		return 0;
 	}
 
 /**
@@ -787,7 +787,7 @@ class DboSource extends DataSource {
 			}
 			return $data;
 		}
-		$cacheKey = crc32($this->startQuote.$data.$this->endQuote);
+		$cacheKey = crc32($this->startQuote . $data . $this->endQuote);
 		if ($return = $this->cacheMethod(__FUNCTION__, $cacheKey)) {
 			return $return;
 		}
@@ -920,7 +920,7 @@ class DboSource extends DataSource {
 		if (is_object($model)) {
 			$schemaName = $model->schemaName;
 			$table = $model->tablePrefix . $model->table;
-		} elseif (isset($this->config['prefix'])) {
+		} elseif (!empty($this->config['prefix']) && strpos($model, $this->config['prefix']) === false) {
 			$table = $this->config['prefix'] . strval($model);
 		} else {
 			$table = strval($model);
@@ -930,14 +930,14 @@ class DboSource extends DataSource {
 		}
 
 		if ($quote) {
-			if ($schema && isset($schemaName)) {
+			if ($schema && !empty($schemaName)) {
 				if (false == strstr($table, '.')) {
 					return $this->name($schemaName) . '.' . $this->name($table);
 				}
 			}
 			return $this->name($table);
 		}
-		if ($schema && isset($schemaName)) {
+		if ($schema && !empty($schemaName)) {
 			if (false == strstr($table, '.')) {
 				return $schemaName . '.' . $table;
 			}
@@ -2004,6 +2004,9 @@ class DboSource extends DataSource {
  */
 	public function begin() {
 		if ($this->_transactionStarted || $this->_connection->beginTransaction()) {
+			if ($this->fullDebug && empty($this->_transactionNesting)) {
+				$this->logQuery('BEGIN');
+			}
 			$this->_transactionStarted = true;
 			$this->_transactionNesting++;
 			return true;
@@ -2024,6 +2027,9 @@ class DboSource extends DataSource {
 			if ($this->_transactionNesting <= 0) {
 				$this->_transactionStarted = false;
 				$this->_transactionNesting = 0;
+				if ($this->fullDebug) {
+					$this->logQuery('COMMIT');
+				}
 				return $this->_connection->commit();
 			}
 			return true;
@@ -2040,6 +2046,9 @@ class DboSource extends DataSource {
  */
 	public function rollback() {
 		if ($this->_transactionStarted && $this->_connection->rollBack()) {
+			if ($this->fullDebug) {
+				$this->logQuery('ROLLBACK');
+			}
 			$this->_transactionStarted = false;
 			$this->_transactionNesting = 0;
 			return true;
@@ -2368,7 +2377,7 @@ class DboSource extends DataSource {
 					$keys = array_keys($value);
 					if ($keys === array_values($keys)) {
 						$count = count($value);
-						if ($count === 1) {
+						if ($count === 1 && !preg_match("/\s+NOT$/", $key)) {
 							$data = $this->_quoteFields($key) . ' = (';
 						} else {
 							$data = $this->_quoteFields($key) . ' IN (';
@@ -2782,15 +2791,15 @@ class DboSource extends DataSource {
 		$statement = $this->_connection->prepare($sql);
 		$this->begin();
 
-		foreach ($values[0] as $key => $val) {
+		foreach ($values[key($values)] as $key => $val) {
 			$type = $this->introspectType($val);
 			$columnMap[$key] = $pdoMap[$type];
 		}
 
-		for ($x = 0; $x < $count; $x++) {
+		foreach ($values as $row => $value) {
 			$i = 1;
-			foreach ($values[$x] as $key => $val) {
-				$statement->bindValue($i, $val, $columnMap[$key]);
+			foreach ($value as $col => $val) {
+				$statement->bindValue($i, $val, $columnMap[$col]);
 				$i += 1;
 			}
 			$statement->execute();

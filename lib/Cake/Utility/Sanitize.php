@@ -1,5 +1,4 @@
 <?php
-App::import('Model', 'ConnectionManager');
 /**
  * Washes strings from unwanted noise.
  *
@@ -19,6 +18,8 @@ App::import('Model', 'ConnectionManager');
  * @since         CakePHP(tm) v 0.10.0.1076
  * @license       MIT License (http://www.opensource.org/licenses/mit-license.php)
  */
+
+App::import('Model', 'ConnectionManager');
 
 /**
  * Data Sanitization.
@@ -68,7 +69,13 @@ class Sanitize {
 		if (is_numeric($string) || $string === null || is_bool($string)) {
 			return $string;
 		}
-		$string = substr($db->value($string), 1);
+		$string = $db->value($string, 'string');
+		if ($string[0] === 'N') {
+			$string = substr($string, 2);
+		} else {
+			$string = substr($string, 1);
+		}
+
 		$string = substr($string, 0, -1);
 		return $string;
 	}

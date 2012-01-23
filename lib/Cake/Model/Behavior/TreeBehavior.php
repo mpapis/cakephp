@@ -93,6 +93,20 @@ class TreeBehavior extends ModelBehavior {
 	}
 
 /**
+ * Runs before a find() operation
+ *
+ * @param Model $Model	Model using the behavior
+ * @param array $query Query parameters as set by cake
+ * @return array
+ */
+	public function beforeFind($Model, $query) {
+		if ($Model->findQueryType == 'threaded' && !isset($query['parent'])) {
+			$query['parent'] = $this->settings[$Model->alias]['parent'];
+		}
+		return $query;
+	}
+
+/**
  * Before delete method. Called before all deletes
  *
  * Will delete the current node and all children using the deleteAll method and sync the table
@@ -163,8 +177,8 @@ class TreeBehavior extends ModelBehavior {
 				$this->_addToWhitelist($Model, $parent);
 			} else {
 				$values = $Model->find('first', array(
-					'conditions' => array($scope,$Model->escapeField() => $Model->id),
-					'fields' => array($Model->primaryKey, $parent, $left, $right ), 'recursive' => $recursive)
+					'conditions' => array($scope, $Model->escapeField() => $Model->id),
+					'fields' => array($Model->primaryKey, $parent, $left, $right), 'recursive' => $recursive)
 				);
 
 				if ($values === false) {
@@ -503,7 +517,7 @@ class TreeBehavior extends ModelBehavior {
 		extract($this->settings[$Model->alias]);
 		list($node) = array_values($Model->find('first', array(
 			'conditions' => array($scope, $Model->escapeField() => $id),
-			'fields' => array($Model->primaryKey, $left, $right, $parent ), 'recursive' => $recursive
+			'fields' => array($Model->primaryKey, $left, $right, $parent), 'recursive' => $recursive
 		)));
 		if ($node[$parent]) {
 			list($parentNode) = array_values($Model->find('first', array(
@@ -527,7 +541,7 @@ class TreeBehavior extends ModelBehavior {
 		}
 		$edge = $this->_getMax($Model, $scope, $right, $recursive);
 		$this->_sync($Model, $edge - $previousNode[$left] +1, '+', 'BETWEEN ' . $previousNode[$left] . ' AND ' . $previousNode[$right]);
-		$this->_sync($Model, $node[$left] - $previousNode[$left], '-', 'BETWEEN ' .$node[$left] . ' AND ' . $node[$right]);
+		$this->_sync($Model, $node[$left] - $previousNode[$left], '-', 'BETWEEN ' . $node[$left] . ' AND ' . $node[$right]);
 		$this->_sync($Model, $edge - $previousNode[$left] - ($node[$right] - $node[$left]), '-', '> ' . $edge);
 		if (is_int($number)) {
 			$number--;
@@ -577,7 +591,6 @@ class TreeBehavior extends ModelBehavior {
 				if ($missingParentAction == 'return') {
 					foreach ($missingParents as $id => $display) {
 						$this->errors[]	= 'cannot find the parent for ' . $Model->alias . ' with id ' . $id . '(' . $display . ')';
-
 					}
 					return false;
 				} elseif ($missingParentAction == 'delete') {
@@ -588,13 +601,14 @@ class TreeBehavior extends ModelBehavior {
 			}
 			$count = 1;
 			foreach ($Model->find('all', array('conditions' => $scope, 'fields' => array($Model->primaryKey), 'order' => $left)) as $array) {
-				$Model->id = $array[$Model->alias][$Model->primaryKey];
 				$lft = $count++;
 				$rght = $count++;
+				$Model->create(false);
+				$Model->id = $array[$Model->alias][$Model->primaryKey];
 				$Model->save(array($left => $lft, $right => $rght), array('callbacks' => false));
 			}
 			foreach ($Model->find('all', array('conditions' => $scope, 'fields' => array($Model->primaryKey, $parent), 'order' => $left)) as $array) {
-				$Model->create();
+				$Model->create(false);
 				$Model->id = $array[$Model->alias][$Model->primaryKey];
 				$this->_setParent($Model, $array[$Model->alias][$parent]);
 			}
@@ -846,11 +860,10 @@ class TreeBehavior extends ModelBehavior {
 
 			if (($Model->id == $parentId)) {
 				return false;
-
 			} elseif (($node[$left] < $parentNode[$left]) && ($parentNode[$right] < $node[$right])) {
 				return false;
 			}
-			if (empty ($node[$left]) && empty ($node[$right])) {
+			if (empty($node[$left]) && empty($node[$right])) {
 				$this->_sync($Model, 2, '+', '>= ' . $parentNode[$right], $created);
 				$result = $Model->save(
 					array($left => $parentNode[$right], $right => $parentNode[$right] + 1, $parent => $parentId),

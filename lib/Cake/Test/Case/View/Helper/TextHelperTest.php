@@ -58,9 +58,9 @@ class TextHelperTest extends CakeTestCase {
 		$text3 = '<b>&copy; 2005-2007, Cake Software Foundation, Inc.</b><br />written by Alexander Wegener';
 		$text4 = '<img src="mypic.jpg"> This image tag is not XHTML conform!<br><hr/><b>But the following image tag should be conform <img src="mypic.jpg" alt="Me, myself and I" /></b><br />Great, or?';
 		$text5 = '0<b>1<i>2<span class="myclass">3</span>4<u>5</u>6</i>7</b>8<b>9</b>0';
-        $text6 = '<p><strong>Extra dates have been announced for this year\'s tour.</strong></p><p>Tickets for the new shows in</p>';
-        $text7 = 'El moño está en el lugar correcto. Eso fue lo que dijo la niña, ¿habrá dicho la verdad?';
-        $text8 = 'Vive la R'.chr(195).chr(169).'publique de France';
+		$text6 = '<p><strong>Extra dates have been announced for this year\'s tour.</strong></p><p>Tickets for the new shows in</p>';
+		$text7 = 'El moño está en el lugar correcto. Eso fue lo que dijo la niña, ¿habrá dicho la verdad?';
+		$text8 = 'Vive la R' . chr(195) . chr(169) . 'publique de France';
 		$text9 = 'НОПРСТУФХЦЧШЩЪЫЬЭЮЯабвгдежзийклмнопрстуфхцчшщъыь';
 
 		$this->assertSame($this->Text->truncate($text1, 15), 'The quick br...');
@@ -86,7 +86,53 @@ class TextHelperTest extends CakeTestCase {
 		$this->assertSame($this->Text->truncate($text7, 15), 'El moño está...');
 		$this->assertSame($this->Text->truncate($text8, 15), 'Vive la R'.chr(195).chr(169).'pu...');
 		$this->assertSame($this->Text->truncate($text9, 10), 'НОПРСТУ...');
+
+		$text = '<p><span style="font-size: medium;"><a>Iamatestwithnospacesandhtml</a></span></p>';
+		$result = $this->Text->truncate($text, 10, array(
+			'ending' => '...',
+			'exact' => false,
+			'html' => true
+		));
+		$expected = '<p><span style="font-size: medium;"><a>...</a></span></p>';
+		$this->assertEquals($expected, $result);
+
+		$text = '<p><span style="font-size: medium;">El biógrafo de Steve Jobs, Walter
+Isaacson, explica porqué Jobs le pidió que le hiciera su biografía en
+este artículo de El País.</span></p>
+<p><span style="font-size: medium;"><span style="font-size:
+large;">Por qué Steve era distinto.</span></span></p>
+<p><span style="font-size: medium;"><a href="http://www.elpais.com/
+articulo/primer/plano/Steve/era/distinto/elpepueconeg/
+20111009elpneglse_4/Tes">http://www.elpais.com/articulo/primer/plano/
+Steve/era/distinto/elpepueconeg/20111009elpneglse_4/Tes</a></span></p>
+<p><span style="font-size: medium;">Ya se ha publicado la biografía de
+Steve Jobs escrita por Walter Isaacson  "<strong>Steve Jobs by Walter
+Isaacson</strong>", aquí os dejamos la dirección de amazon donde
+podeís adquirirla.</span></p>
+<p><span style="font-size: medium;"><a>http://www.amazon.com/Steve-
+Jobs-Walter-Isaacson/dp/1451648537</a></span></p>';
+		$result = $this->Text->truncate($text, 500, array(
+			'ending' => '... ',
+			'exact' => false,
+			'html' => true
+		));
+		$expected = '<p><span style="font-size: medium;">El biógrafo de Steve Jobs, Walter
+Isaacson, explica porqué Jobs le pidió que le hiciera su biografía en
+este artículo de El País.</span></p>
+<p><span style="font-size: medium;"><span style="font-size:
+large;">Por qué Steve era distinto.</span></span></p>
+<p><span style="font-size: medium;"><a href="http://www.elpais.com/
+articulo/primer/plano/Steve/era/distinto/elpepueconeg/
+20111009elpneglse_4/Tes">http://www.elpais.com/articulo/primer/plano/
+Steve/era/distinto/elpepueconeg/20111009elpneglse_4/Tes</a></span></p>
+<p><span style="font-size: medium;">Ya se ha publicado la biografía de
+Steve Jobs escrita por Walter Isaacson  "<strong>Steve Jobs by Walter
+Isaacson</strong>", aquí os dejamos la dirección de amazon donde
+podeís adquirirla.</span></p>
+<p><span style="font-size: medium;"><a>... </a></span></p>';
+		$this->assertEquals($expected, $result);
 	}
+
 /**
  * testHighlight method
  *
@@ -239,12 +285,12 @@ class TextHelperTest extends CakeTestCase {
 		$text = 'This is a <b>test</b> text with URL http://www.cakephp.org';
 		$expected = 'This is a &lt;b&gt;test&lt;/b&gt; text with URL <a href="http://www.cakephp.org">http://www.cakephp.org</a>';
 		$result = $this->Text->autoLink($text);
-		$this->assertEqual($expected, $result);
+		$this->assertEquals($expected, $result);
 
 		$text = 'This is a <b>test</b> text with URL http://www.cakephp.org';
 		$expected = 'This is a <b>test</b> text with URL <a href="http://www.cakephp.org">http://www.cakephp.org</a>';
 		$result = $this->Text->autoLink($text, array('escape' => false));
-		$this->assertEqual($expected, $result);
+		$this->assertEquals($expected, $result);
 	}
 
 /**
@@ -383,7 +429,7 @@ class TextHelperTest extends CakeTestCase {
 	public function testExcerpt() {
 		$text = 'This is a phrase with test text to play with';
 
-		$expected = '...with test text...';
+		$expected = '...ase with test text to ...';
 		$result = $this->Text->excerpt($text, 'test', 9, '...');
 		$this->assertEquals($expected, $result);
 
@@ -399,18 +445,19 @@ class TextHelperTest extends CakeTestCase {
 		$result = $this->Text->excerpt($text, null, 200, '...');
 		$this->assertEquals($expected, $result);
 
-		$expected = '...phrase...';
+		$expected = '...a phrase w...';
 		$result = $this->Text->excerpt($text, 'phrase', 2, '...');
 		$this->assertEquals($expected, $result);
 
-		$phrase = 'This is a phrase with test';
+		$phrase = 'This is a phrase with test text';
 		$expected = $text;
-		$result = $this->Text->excerpt($text, $phrase, strlen($phrase) + 3, '...');
+		$result = $this->Text->excerpt($text, $phrase, 13, '...');
 		$this->assertEquals($expected, $result);
-
-		$phrase = 'This is a phrase with text';
-		$expected = $text;
-		$result = $this->Text->excerpt($text, $phrase, 10, '...');
+		
+		$text = 'aaaaaaaaaaaaaaaaaaaaaaaabbbbbbbbaaaaaaaaaaaaaaaaaaaaaaaa';
+		$phrase = 'bbbbbbbb';
+		$result = $this->Text->excerpt($text, $phrase, 10);
+		$expected = '...aaaaaaaaaabbbbbbbbaaaaaaaaaa...';
 		$this->assertEquals($expected, $result);
 	}
 
@@ -422,7 +469,7 @@ class TextHelperTest extends CakeTestCase {
 	public function testExcerptCaseInsensitivity() {
 		$text = 'This is a phrase with test text to play with';
 
-		$expected = '...with test text...';
+		$expected = '...ase with test text to ...';
 		$result = $this->Text->excerpt($text, 'TEST', 9, '...');
 		$this->assertEquals($expected, $result);
 
