@@ -94,7 +94,7 @@ class CrudAuthorize extends BaseAuthorize {
 		$Acl = $this->_Collection->load('Acl');
 		return $Acl->check(
 			$user,
-			$this->action($request, ':controller'),
+			$this->action($request, ':plugin/:controller'),
 			$this->settings['actionMap'][$request->params['action']]
 		);
 	}

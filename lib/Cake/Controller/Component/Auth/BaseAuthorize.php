@@ -106,7 +106,7 @@ abstract class BaseAuthorize {
  * @param string $path
  * @return string the action path for the given request.
  */
-	public function action($request, $path = '/:plugin/:controller/:action') {
+	public function action($request, $path = ':plugin/:controller/:action') {
 		$plugin = empty($request['plugin']) ? null : Inflector::camelize($request['plugin']) . '/';
 		return str_replace(
 			array(':controller', ':action', ':plugin/'),

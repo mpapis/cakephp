@@ -286,6 +286,22 @@ class AclNodeTest extends CakeTestCase {
 
 		$result = $Aco->node('');
 		$this->assertEquals($result, null);
+
+		//Using refs of Authorize objects action() to build aco alias
+		$result = Set::extract($Aco->node('ROOT/Users/Users/view'), '{n}.DbAcoTest.id');
+		$expected = array(12, 11, 10, 1);
+		$this->assertEquals($expected, $result);
+
+		$result = Set::extract($Aco->node('ROOT/Duplicates/users'), '{n}.DbAcoTest.id');
+		$expected = array(14, 13, 1);
+		$this->assertEquals($expected, $result);
+
+		$result = Set::extract($Aco->node('ROOT/Controller1/action2'), '{n}.DbAcoTest.id');
+		$expected = array(5, 2, 1);
+		$this->assertEquals($expected, $result);
+
+		$result = Set::extract($Aco->node('/ROOT/Controller1/action2'), '{n}.DbAcoTest.id');
+		$this->assertEquals($result, null);
 	}
 
 /**

@@ -37,7 +37,7 @@ class ActionsAuthorizeTest extends CakeTestCase {
 		$this->Collection = $this->getMock('ComponentCollection');
 
 		$this->auth = new ActionsAuthorize($this->Collection);
-		$this->auth->settings['actionPath'] = '/controllers';
+		$this->auth->settings['actionPath'] = 'controllers/';
 	}
 
 /**
@@ -75,7 +75,7 @@ class ActionsAuthorizeTest extends CakeTestCase {
 
 		$this->Acl->expects($this->once())
 			->method('check')
-			->with($user, '/controllers/Posts/index')
+			->with($user, 'controllers/Posts/index')
 			->will($this->returnValue(false));
 
 		$this->assertFalse($this->auth->authorize($user['User'], $request));
@@ -104,7 +104,7 @@ class ActionsAuthorizeTest extends CakeTestCase {
 
 		$this->Acl->expects($this->once())
 			->method('check')
-			->with($user, '/controllers/Posts/index')
+			->with($user, 'controllers/Posts/index')
 			->will($this->returnValue(true));
 
 		$this->assertTrue($this->auth->authorize($user['User'], $request));
@@ -125,7 +125,7 @@ class ActionsAuthorizeTest extends CakeTestCase {
 
 		$result = $this->auth->action($request);
 
-		$this->assertEquals('/controllers/Posts/index', $result);
+		$this->assertEquals('controllers/Posts/index', $result);
 	}
 
 /**
@@ -142,6 +142,60 @@ class ActionsAuthorizeTest extends CakeTestCase {
 		));
 
 		$result = $this->auth->action($request);
-		$this->assertEquals('/controllers/DebugKit/Posts/index', $result);
+		$this->assertEquals('controllers/DebugKit/Posts/index', $result);
+	}
+
+/**
+ * test action(), make sure the path does not start with /
+ * else Aco::node() will not find the aco
+ *
+ * @return void
+ */
+	public function testActionSlash() {
+		$this->auth->settings['actionPath'] = null;
+		$request = new CakeRequest('/posts/index', false);
+		$request->addParams(array(
+			'plugin' => null,
+			'controller' => 'posts',
+			'action' => 'index'
+		));
+		$result = $this->auth->action($request);
+		$this->assertEquals('Posts/index', $result);
+
+		$request = new CakeRequest('/debug_kit/posts/index', false);
+		$request->addParams(array(
+			'plugin' => 'debug_kit',
+			'controller' => 'posts',
+			'action' => 'index'
+		));
+
+		$result = $this->auth->action($request);
+		$this->assertEquals('DebugKit/Posts/index', $result);
+	}
+
+/**
+ * extra test related to ticket #1739
+ *
+ * @return void
+ */
+	public function testActionExtra() {
+		$this->auth->settings['actionPath'] = 'ROOT/';
+		$request = new CakeRequest('/users/users/view', false);
+		$request->addParams(array(
+			'plugin' => 'users',
+			'controller' => 'users',
+			'action' => 'view'
+		));
+		$result = $this->auth->action($request);
+		$this->assertEquals('ROOT/Users/Users/view', $result);
+
+		$request = new CakeRequest('/duplicates/users', false);
+		$request->addParams(array(
+			'plugin' => null,
+			'controller' => 'duplicates',
+			'action' => 'users'
+		));
+		$result = $this->auth->action($request);
+		$this->assertEquals('ROOT/Duplicates/users', $result);
 	}
 }
