@@ -1986,11 +1986,7 @@ class Model extends Object implements CakeEventListener {
 			return $this->saveMany($data, $options);
 		}
 		if ($options['validate'] === 'only') {
-			$validatesAssoc = $this->validateAssociated($data, $options);
-			if (isset($this->validationErrors[$this->alias]) && $this->validationErrors[$this->alias] === false) {
-				return false;
-			}
-			return $validatesAssoc;
+			return $this->validateAssociated($data, $options);
 		}
 		return $this->saveAssociated($data, $options);
 	}
@@ -2049,7 +2045,7 @@ class Model extends Object implements CakeEventListener {
 				$validationErrors[$key] = $this->validationErrors;
 			}
 			if (!$options['atomic']) {
-				$return[] = $validates;
+				$return[$key] = $validates;
 			} elseif (!$validates) {
 				break;
 			}
@@ -2089,11 +2085,14 @@ class Model extends Object implements CakeEventListener {
 		$options = array_merge(array('atomic' => true), $options);
 		$this->validationErrors = $validationErrors = $return = array();
 		foreach ($data as $key => $record) {
-			$validates = $this->create($record) && $this->validates($options);
-			if (!$validates) {
+			$validates = $this->validateAssociated($record, $options);
+			if ($validates === false || (is_array($validates) && in_array(false, $validates, true))) {
 				$validationErrors[$key] = $this->validationErrors;
+				$validates = false;
+			} else {
+				$validates = true;
 			}
-			$return[] = $validates;
+			$return[$key] = $validates;
 		}
 		$this->validationErrors = $validationErrors;
 		if (!$options['atomic']) {
@@ -2166,7 +2165,7 @@ class Model extends Object implements CakeEventListener {
 				} else {
 					$validationErrors[$association] = $this->{$association}->validationErrors;
 				}
-				$return[$association][] = $validates;
+				$return[$association] = $validates;
 			}
 		}
 		if ($validates && !($this->create(null) !== null && $this->save($data, $options))) {
@@ -2193,7 +2192,7 @@ class Model extends Object implements CakeEventListener {
 						if (!$validates) {
 							$validationErrors[$association] = $this->{$association}->validationErrors;
 						}
-						$return[$association][] = $validates;
+						$return[$association] = $validates;
 					break;
 					case 'hasMany':
 						foreach ($values as $i => $value) {
@@ -2253,12 +2252,19 @@ class Model extends Object implements CakeEventListener {
 			$return[$this->alias] = true;
 		}
 		$associations = $this->getAssociated();
-		$validates = true;
 		foreach ($data as $association => $values) {
+			$validates = true;
 			if (isset($associations[$association])) {
 				if (in_array($associations[$association], array('belongsTo', 'hasOne'))) {
-					$validates = $this->{$association}->create($values) && $this->{$association}->validates($options);
-					$return[$association][] = $validates;
+					$validates = $this->{$association}->validateAssociated($values, $options);
+					if (is_array($validates)) {
+						if (in_array(false, $validates, true)) {
+							$validates = false;
+						} else {
+							$validates = true;
+						}
+					}
+					$return[$association] = $validates;
 				} elseif ($associations[$association] === 'hasMany') {
 					$validates = $this->{$association}->validateMany($values, $options);
 					$return[$association] = $validates;
