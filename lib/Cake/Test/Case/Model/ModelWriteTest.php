@@ -5509,4 +5509,45 @@ class ModelWriteTest extends BaseModelTest {
 		$this->assertSame($result['Article']['id'], $TestModel->id);
 	}
 
+	public function testDboExecute() {
+		$this->loadFixtures('Article');
+		$TestModel = new Article();
+
+		$sql = "CREATE TABLE `posts2` (
+			`id` int(8) NOT NULL AUTO_INCREMENT COMMENT '',
+			`title` varchar(45) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL COMMENT '',
+			`text` varchar(45) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL COMMENT 'test commentaar',	PRIMARY KEY  (`id`))	DEFAULT CHARSET=latin1,
+			COLLATE=latin1_swedish_ci,
+			ENGINE=InnoDB;";
+		$sql .= "CREATE TABLE `posts3` (
+			`id` int(8) NOT NULL AUTO_INCREMENT COMMENT '',
+			`title` varchar(45) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL COMMENT '',
+			`text` varchar(45) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL COMMENT 'test commentaar',	PRIMARY KEY  (`id`))	DEFAULT CHARSET=latin1,
+			COLLATE=latin1_swedish_ci,
+			ENGINE=InnoDB;";
+		$result = $TestModel->getDataSource()->rawQuery($sql);
+
+		$sql = "DROP TABLE IF EXISTS `posts2`;DROP TABLE IF EXISTS `posts3`;";
+		$TestModel->getDataSource()->rawQuery($sql);
+		$this->assertTrue($result);
+
+		$sql = "CREATE TABLE `posts2` (
+			`id` int(8) NOT NULL AUTO_INCREMENT COMMENT '',
+			`title` varchar(45) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL COMMENT '',
+			`text` varchar(45) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL COMMENT 'test;commentaar',	PRIMARY KEY  (`id`))	DEFAULT CHARSET=latin1,
+			COLLATE=latin1_swedish_ci,
+			ENGINE=InnoDB;";
+		$sql .= "CREATE TABLE `posts3` (
+			`id` int(8) NOT NULL AUTO_INCREMENT COMMENT '',
+			`title` varchar(45) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL COMMENT '',
+			`text` varchar(45) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL COMMENT 'test;commentaar',	PRIMARY KEY  (`id`))	DEFAULT CHARSET=latin1,
+			COLLATE=latin1_swedish_ci,
+			ENGINE=InnoDB;";
+		$result = $TestModel->getDataSource()->rawQuery($sql);
+
+		$sql = "DROP TABLE IF EXISTS `posts2`;DROP TABLE IF EXISTS `posts3`;";
+		$TestModel->getDataSource()->rawQuery($sql);
+		$this->assertTrue($result);
+	}
+
 }
