@@ -120,7 +120,7 @@ class AclNode extends AppModel {
 				return false;
 			}
 		} elseif (is_object($ref) && is_a($ref, 'Model')) {
-			$ref = array('model' => $ref->alias, 'foreign_key' => $ref->id);
+			$ref = array('model' => $ref->name, 'foreign_key' => $ref->id);
 		} elseif (is_array($ref) && !(isset($ref['model']) && isset($ref['foreign_key']))) {
 			$name = key($ref);
 			list($plugin, $alias) = pluginSplit($name);
