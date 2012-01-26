@@ -306,6 +306,7 @@ class View extends Object {
 			}
 			$this->_eventManager = $controller->getEventManager();
 		}
+		$this->_paths(null, true, true);
 		$this->Helpers = new HelperCollection($this);
 		$this->Blocks = new ViewBlock();
 		parent::__construct();
@@ -1049,7 +1050,7 @@ class View extends Object {
  * @param boolean $cached Set to true to force a refresh of view paths.
  * @return array paths
  */
-	protected function _paths($plugin = null, $cached = true) {
+	protected function _paths($plugin = null, $cached = true, $build = false) {
 		if ($plugin === null && $cached === true && !empty($this->_paths)) {
 			return $this->_paths;
 		}
@@ -1068,20 +1069,25 @@ class View extends Object {
 
 		$paths = array_unique(array_merge($paths, $viewPaths, array_keys($corePaths)));
 		if (!empty($this->theme)) {
-			$themePaths = array();
+			$themePaths = $helperPaths = array();
 			$count = count($paths);
 			for ($i = 0; $i < $count; $i++) {
 				if (strpos($paths[$i], DS . 'Plugin' . DS) === false
 					&& strpos($paths[$i], DS . 'Cake' . DS . 'View') === false) {
 						if ($plugin) {
 							$themePaths[] = $paths[$i] . 'Themed'. DS . $this->theme . DS . 'Plugin' . DS . $plugin . DS;
+						} else {
+							$helperPaths[] = $paths[$i] . 'Themed'. DS . $this->theme . DS . 'Helper' . DS;
 						}
 						$themePaths[] = $paths[$i] . 'Themed'. DS . $this->theme . DS;
 					}
 			}
 			$paths = array_merge($themePaths, $paths);
+			if ($helperPaths && $build) {
+				App::build(array('View/Helper' => $helperPaths), APP::PREPEND);
+			}
 		}
-		if ($plugin !== null) {
+		if ($plugin !== null || $build) {
 			return $paths;
 		}
 		return $this->_paths = $paths;
