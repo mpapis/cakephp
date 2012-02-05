@@ -255,10 +255,7 @@ class FormHelper extends AppHelper {
 			}
 
 			foreach ($validateProperties as $rule => $validateProp) {
-				if (isset($validateProp['allowEmpty']) && $validateProp['allowEmpty'] === true) {
-					return false;
-				}
-				if (!$this->_isRequiredForOnKey($validateProp)) {
+				if (!$this->_parseRuleRequired($validateProp)) {
 					return false;
 				}
 				$rule = isset($validateProp['rule']) ? $validateProp['rule'] : false;
@@ -2603,17 +2600,19 @@ class FormHelper extends AppHelper {
  * @param array $validateProp
  * @return boolean True if the field is required by on key, false otherwise.
  */
-	protected function _isRequiredForOnKey($validateProp) {
-		if (!isset($validateProp['on'])) {
+	protected function _parseRuleRequired($validateProp) {
+		if (isset($validateProp['allowEmpty']) && $validateProp['allowEmpty'] === true) {
+			return false;
+		}
+		if (!isset($validateProp['required']) || $validateProp['required'] === true) {
 			return true;
 		}
-		$validateProp['on'] = array_map('strtolower', (array) $validateProp['on']);
 
-		switch (strtolower($this->requestType)) {
+		switch ($this->requestType) {
 			case 'post':
-				return in_array('create', $validateProp['on']);
+				return (strtolower($validateProp['required']) == 'create');
 			case 'put':
-				return in_array('update', $validateProp['on']);
+				return (strtolower($validateProp['required']) == 'update');
 			default:
 				return true;
 		}
