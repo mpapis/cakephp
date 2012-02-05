@@ -2607,10 +2607,7 @@ class FormHelper extends AppHelper {
 		if (!isset($validateProp['on'])) {
 			return true;
 		}
-		if (is_string($validateProp['on'])) {
-			$validateProp['on'] = (array) $validateProp['on'];
-		}
-		$validateProp['on'] = array_map('strtolower', $validateProp['on']);
+		$validateProp['on'] = array_map('strtolower', (array) $validateProp['on']);
 
 		switch (strtolower($this->requestType)) {
 			case 'post':
