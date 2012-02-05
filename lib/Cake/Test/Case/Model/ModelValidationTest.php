@@ -782,7 +782,7 @@ class ModelValidationTest extends BaseModelTest {
 			'title' => array(
 				'notempty' => array(
 					'rule' => 'notEmpty',
-					'on' => 'create'
+					'required' => 'create'
 				)
 			)
 		);
@@ -800,7 +800,7 @@ class ModelValidationTest extends BaseModelTest {
 			'title' => array(
 				'notempty' => array(
 					'rule' => 'notEmpty',
-					'on' => 'update'
+					'required' => 'update'
 				)
 			)
 		);
@@ -813,5 +813,4 @@ class ModelValidationTest extends BaseModelTest {
 		$Article->set($data);
 		$this->assertFalse($Article->validates());
 	}
-
 }

@@ -3016,24 +3016,18 @@ class Model extends Object implements CakeEventListener {
 				}
 				$validator = array_merge($default, $validator);
 
-				if (!empty($validator['on'])) {
+				if ($validator['required'] !== true) {
 					if ($exists === null) {
 						$exists = $this->exists();
 					}
-					if (($validator['on'] == 'create' && $exists) || ($validator['on'] == 'update' && !$exists)) {
+					if (($validator['required'] == 'create' && $exists) || ($validator['required'] == 'update' && !$exists)) {
 						continue;
 					}
 				}
 
 				$valid = true;
 				$requiredFail = (
-					(!isset($data[$fieldName]) &&
-						(
-							$validator['required'] === true ||
-							($validator['required'] == 'create' && !$exists) ||
-							($validator['required'] == 'update' && $exists)
-						)
-					) ||
+					(!isset($data[$fieldName]) && $validator['required'] === true) ||
 					(
 						isset($data[$fieldName]) && (empty($data[$fieldName]) &&
 						!is_numeric($data[$fieldName])) && $validator['allowEmpty'] === false
