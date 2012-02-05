@@ -3027,7 +3027,13 @@ class Model extends Object implements CakeEventListener {
 
 				$valid = true;
 				$requiredFail = (
-					(!isset($data[$fieldName]) && $validator['required'] === true) ||
+					(!isset($data[$fieldName]) &&
+						(
+							$validator['required'] === true ||
+							($validator['required'] == 'create' && !$exists) ||
+							($validator['required'] == 'update' && $exists)
+						)
+					) ||
 					(
 						isset($data[$fieldName]) && (empty($data[$fieldName]) &&
 						!is_numeric($data[$fieldName])) && $validator['allowEmpty'] === false
