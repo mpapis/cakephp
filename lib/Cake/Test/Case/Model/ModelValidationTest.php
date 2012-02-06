@@ -782,7 +782,7 @@ class ModelValidationTest extends BaseModelTest {
 			'title' => array(
 				'notempty' => array(
 					'rule' => 'notEmpty',
-					'required' => 'create'
+					'on' => 'create'
 				)
 			)
 		);
@@ -800,7 +800,7 @@ class ModelValidationTest extends BaseModelTest {
 			'title' => array(
 				'notempty' => array(
 					'rule' => 'notEmpty',
-					'required' => 'update'
+					'on' => 'update'
 				)
 			)
 		);
