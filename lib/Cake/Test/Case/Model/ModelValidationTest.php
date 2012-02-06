@@ -813,4 +813,5 @@ class ModelValidationTest extends BaseModelTest {
 		$Article->set($data);
 		$this->assertFalse($Article->validates());
 	}
+
 }
