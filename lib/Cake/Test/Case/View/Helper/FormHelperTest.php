@@ -104,9 +104,9 @@ class Contact extends CakeTestModel {
 		'non_existing' => array(),
 		'idontexist' => array(),
 		'imrequired' => array('rule' => array('between', 5, 30), 'allowEmpty' => false),
-		'imrequiredonupdate' => array('rule' => 'alphaNumeric', 'required' => 'update', 'allowEmpty' => false),
-		'imrequiredoncreate' => array('rule' => 'alphaNumeric', 'required' => 'create', 'allowEmpty' => false),
-		'imrequiredonboth' => array('rule' => 'alphaNumeric', 'required' => true, 'allowEmpty' => false),
+		'imrequiredonupdate' => array('notEmpty' => array('rule' => 'alphaNumeric', 'on' => 'update')),
+		'imrequiredoncreate' => array('required' => array('rule' => 'alphaNumeric', 'on' => 'create')),
+		'imrequiredonboth' => array('required' => array('rule' => 'alphaNumeric')),
 		'string_required' => 'notEmpty',
 		'imalsorequired' => array('rule' => 'alphaNumeric', 'allowEmpty' => false),
 		'imrequiredtoo' => array('rule' => 'notEmpty'),
@@ -7762,7 +7762,7 @@ class FormHelperTest extends CakeTestCase {
 
 /**
  * Tests that the 'on' key validates as expected on create
- * 
+ *
  * @return void
  */
 	public function testRequiredOnCreate() {
@@ -7827,7 +7827,7 @@ class FormHelperTest extends CakeTestCase {
 
 /**
  * Tests that the 'on' key validates as expected on update
- * 
+ *
  * @return void
  */
 	public function testRequiredOnUpdate() {
