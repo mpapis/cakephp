@@ -3044,7 +3044,7 @@ class ModelWriteTest extends BaseModelTest {
 				array('comment' => 'First new comment', 'published' => 'Y', 'User' => array('user' => 'newuser', 'password' => 'newuserpass')),
 				array('comment' => 'Second new comment', 'published' => 'Y', 'user_id' => 2)
 			)
-		));
+		), array('deep' => true));
 		$this->assertTrue($result);
 
 		$result = $TestModel->findById(2);
@@ -3064,7 +3064,7 @@ class ModelWriteTest extends BaseModelTest {
 				array('comment' => 'Third new comment', 'published' => 'Y', 'user_id' => 5),
 				array('comment' => 'Fourth new comment', 'published' => 'Y', 'user_id' => 2, 'Attachment' => array('attachment' => 'deepsaved'))
 			)
-		));
+		), array('deep' => true));
 		$this->assertTrue($result);
 
 		$result = $TestModel->findById(2);
@@ -3100,7 +3100,7 @@ class ModelWriteTest extends BaseModelTest {
 		);
 
 		$TestModel->Comment->Attachment->create();
-		$result = $TestModel->Comment->Attachment->saveAll($data);
+		$result = $TestModel->Comment->Attachment->saveAll($data, array('deep' => true));
 		$this->assertFalse($result);
 
 		$expected = array('User' => array('user' => array('This field cannot be left blank')));
@@ -3108,7 +3108,7 @@ class ModelWriteTest extends BaseModelTest {
 
 		$data['Comment']['Article']['User']['user'] = 'deepsave';
 		$TestModel->Comment->Attachment->create();
-		$result = $TestModel->Comment->Attachment->saveAll($data);
+		$result = $TestModel->Comment->Attachment->saveAll($data, array('deep' => true));
 		$this->assertTrue($result);
 
 		$result = $TestModel->Comment->Attachment->findById($TestModel->Comment->Attachment->id);
@@ -3193,7 +3193,7 @@ class ModelWriteTest extends BaseModelTest {
 			)
 		);
 		$TestModel->Comment->validate['comment'] = 'notEmpty';
-		$result = $TestModel->saveAll($data);
+		$result = $TestModel->saveAll($data, array('deep' => true));
 		$this->assertFalse($result);
 
 		$expected = array(
@@ -3232,7 +3232,7 @@ class ModelWriteTest extends BaseModelTest {
 				)
 			)
 		);
-		$result = $TestModel->saveAll($data);
+		$result = $TestModel->saveAll($data, array('deep' => true));
 		$this->assertTrue($result);
 	}
 /**
@@ -3257,7 +3257,7 @@ class ModelWriteTest extends BaseModelTest {
 					array('comment' => 'Second new comment', 'published' => 'Y', 'user_id' => 2)
 				)
 			),
-			array('validate' => 'only')
+			array('validate' => 'only', 'deep' => true)
 		);
 		$this->assertTrue($result);
 
@@ -3269,7 +3269,7 @@ class ModelWriteTest extends BaseModelTest {
 					array('comment' => 'Second new comment', 'published' => 'Y', 'user_id' => 2)
 				)
 			),
-			array('validate' => 'only')
+			array('validate' => 'only', 'deep' => true)
 		);
 		$this->assertFalse($result);
 
@@ -3281,7 +3281,7 @@ class ModelWriteTest extends BaseModelTest {
 					array('comment' => 'Second new comment', 'published' => 'Y', 'user_id' => 2)
 				)
 			),
-			array('validate' => 'only', 'atomic' => false)
+			array('validate' => 'only', 'atomic' => false, 'deep' => true)
 		);
 		$expected = array(
 			'Article' => true,
@@ -3300,7 +3300,7 @@ class ModelWriteTest extends BaseModelTest {
 					array('comment' => 'Second new comment', 'published' => 'Y', 'user_id' => 2)
 				)
 			),
-			array('validate' => 'only', 'atomic' => false)
+			array('validate' => 'only', 'atomic' => false, 'deep' => true)
 		);
 		$expected = array(
 			'Article' => true,
@@ -3318,7 +3318,7 @@ class ModelWriteTest extends BaseModelTest {
 				array('comment' => 'Fourth new comment', 'published' => 'Y', 'user_id' => 2, 'Attachment' => array('attachment' => 'deepsaved'))
 			)
 		),
-		array('validate' => 'only')
+		array('validate' => 'only', 'deep' => true)
 		);
 		$this->assertTrue($result);
 
@@ -3329,7 +3329,7 @@ class ModelWriteTest extends BaseModelTest {
 				array('comment' => 'Fourth new comment', 'published' => 'Y', 'user_id' => 2, 'Attachment' => array('attachment' => ''))
 			)
 		),
-		array('validate' => 'only')
+		array('validate' => 'only', 'deep' => true)
 		);
 		$this->assertFalse($result);
 
@@ -3340,7 +3340,7 @@ class ModelWriteTest extends BaseModelTest {
 				array('comment' => 'Fourth new comment', 'published' => 'Y', 'user_id' => 2, 'Attachment' => array('attachment' => 'deepsave'))
 			)
 		),
-		array('validate' => 'only', 'atomic' => false)
+		array('validate' => 'only', 'atomic' => false, 'deep' => true)
 		);
 		$expected = array(
 			'Article' => true,
@@ -3358,7 +3358,7 @@ class ModelWriteTest extends BaseModelTest {
 				array('comment' => 'Fourth new comment', 'published' => 'Y', 'user_id' => 2, 'Attachment' => array('attachment' => ''))
 			)
 		),
-		array('validate' => 'only', 'atomic' => false)
+		array('validate' => 'only', 'atomic' => false, 'deep' => true)
 		);
 		$expected = array(
 			'Article' => true,
@@ -3400,10 +3400,10 @@ class ModelWriteTest extends BaseModelTest {
 			)
 		);
 
-		$result = $TestModel->Comment->Attachment->saveAll($data, array('validate' => 'only'));
+		$result = $TestModel->Comment->Attachment->saveAll($data, array('validate' => 'only', 'deep' => true));
 		$this->assertTrue($result);
 
-		$result = $TestModel->Comment->Attachment->saveAll($data, array('validate' => 'only', 'atomic' => false));
+		$result = $TestModel->Comment->Attachment->saveAll($data, array('validate' => 'only', 'atomic' => false, 'deep' => true));
 		$expected = array(
 			'Attachment' => true,
 			'Comment' => true
@@ -3429,7 +3429,7 @@ class ModelWriteTest extends BaseModelTest {
 			)
 		);
 
-		$result = $TestModel->Comment->Attachment->saveAll($data, array('validate' => 'only'));
+		$result = $TestModel->Comment->Attachment->saveAll($data, array('validate' => 'only', 'deep' => true));
 		$this->assertFalse($result);
 
 		$result = $TestModel->Comment->Attachment->validationErrors;
@@ -3444,7 +3444,7 @@ class ModelWriteTest extends BaseModelTest {
 		);
 		$this->assertSame($expected, $result);
 
-		$result = $TestModel->Comment->Attachment->saveAll($data, array('validate' => 'only', 'atomic' => false));
+		$result = $TestModel->Comment->Attachment->saveAll($data, array('validate' => 'only', 'atomic' => false, 'deep' => true));
 		$expected = array(
 			'Attachment' => true,
 			'Comment' => false
@@ -3452,7 +3452,7 @@ class ModelWriteTest extends BaseModelTest {
 		$this->assertEquals($expected, $result);
 
 		$data['Comment']['Article']['body'] = '';
-		$result = $TestModel->Comment->Attachment->saveAll($data, array('validate' => 'only'));
+		$result = $TestModel->Comment->Attachment->saveAll($data, array('validate' => 'only', 'deep' => true));
 		$this->assertFalse($result);
 
 		$result = $TestModel->Comment->Attachment->validationErrors;
@@ -3465,7 +3465,7 @@ class ModelWriteTest extends BaseModelTest {
 		);
 		$this->assertSame($expected, $result);
 
-		$result = $TestModel->Comment->Attachment->saveAll($data, array('validate' => 'only', 'atomic' => false));
+		$result = $TestModel->Comment->Attachment->saveAll($data, array('validate' => 'only', 'atomic' => false, 'deep' => true));
 		$expected = array(
 			'Attachment' => true,
 			'Comment' => false
@@ -3473,7 +3473,7 @@ class ModelWriteTest extends BaseModelTest {
 		$this->assertEquals($expected, $result);
 
 		$data['Comment']['comment'] = '';
-		$result = $TestModel->Comment->Attachment->saveAll($data, array('validate' => 'only'));
+		$result = $TestModel->Comment->Attachment->saveAll($data, array('validate' => 'only', 'deep' => true));
 		$this->assertFalse($result);
 
 		$result = $TestModel->Comment->Attachment->validationErrors;
@@ -3484,7 +3484,7 @@ class ModelWriteTest extends BaseModelTest {
 		);
 		$this->assertSame($expected, $result);
 
-		$result = $TestModel->Comment->Attachment->saveAll($data, array('validate' => 'only', 'atomic' => false));
+		$result = $TestModel->Comment->Attachment->saveAll($data, array('validate' => 'only', 'atomic' => false, 'deep' => true));
 		$expected = array(
 			'Attachment' => true,
 			'Comment' => false
@@ -3492,7 +3492,7 @@ class ModelWriteTest extends BaseModelTest {
 		$this->assertEquals($expected, $result);
 
 		$data['Attachment']['attachment'] = '';
-		$result = $TestModel->Comment->Attachment->saveAll($data, array('validate' => 'only'));
+		$result = $TestModel->Comment->Attachment->saveAll($data, array('validate' => 'only', 'deep' => true));
 		$this->assertFalse($result);
 
 		$result = $TestModel->Comment->Attachment->validationErrors;
@@ -3503,10 +3503,295 @@ class ModelWriteTest extends BaseModelTest {
 		$expected = array('comment' => array('This field cannot be left blank'));
 		$this->assertSame($expected, $result);
 
-		$result = $TestModel->Comment->Attachment->saveAll($data, array('validate' => 'only', 'atomic' => false));
+		$result = $TestModel->Comment->Attachment->saveAll($data, array('validate' => 'only', 'atomic' => false, 'deep' => true));
 		$expected = array(
 			'Attachment' => false,
 			'Comment' => false
+		);
+		$this->assertEquals($expected, $result);
+	}
+
+/**
+ * testSaveAllNotDeepAssociated method
+ * test that only directly associated data gets saved
+ *
+ * @return void
+ */
+	public function testSaveAllNotDeepAssociated() {
+		$this->loadFixtures('Article', 'Comment', 'User', 'Attachment');
+		$TestModel = new Article();
+		$TestModel->hasMany['Comment']['order'] = array('Comment.created' => 'ASC');
+		$TestModel->hasAndBelongsToMany = array();
+
+		$result = $TestModel->saveAll(array(
+			'Article' => array('id' => 2),
+			'Comment' => array(
+				array('comment' => 'First new comment', 'published' => 'Y', 'User' => array('user' => 'newuser', 'password' => 'newuserpass')),
+				array('comment' => 'Second new comment', 'published' => 'Y', 'user_id' => 2)
+			)
+		), array('deep' => false));
+		$this->assertTrue($result);
+
+		$result = $TestModel->Comment->User->field('id', array('user' => 'newuser', 'password' => 'newuserpass'));
+		$this->assertFalse($result);
+
+		$result = $TestModel->saveAll(array(
+			'Article' => array('id' => 2),
+			'Comment' => array(
+				array('comment' => 'Third new comment', 'published' => 'Y', 'user_id' => 4),
+				array('comment' => 'Fourth new comment', 'published' => 'Y', 'user_id' => 2, 'Attachment' => array('attachment' => 'deepsaved'))
+			)
+		), array('deep' => false));
+		$this->assertTrue($result);
+
+		$result = $TestModel->Comment->Attachment->field('id', array('attachment' => 'deepsaved'));
+		$this->assertFalse($result);
+
+		$data = array(
+			'Attachment' => array(
+				'attachment' => 'deepsave insert',
+			),
+			'Comment' => array(
+				'comment' => 'First comment deepsave insert',
+				'published' => 'Y',
+				'user_id' => 4,
+				'Article' => array(
+					'title' => 'First Article deepsave insert',
+					'body' => 'First Article Body deepsave insert',
+					'User' => array(
+						'user' => 'deepsave',
+						'password' => 'magic'
+					),
+				),
+			)
+		);
+		$expected = $TestModel->User->find('count');
+
+		$TestModel->Comment->Attachment->create();
+		$result = $TestModel->Comment->Attachment->saveAll($data, array('deep' => false));
+		$this->assertTrue($result);
+
+		$result = $TestModel->User->find('count');
+		$this->assertEquals($expected, $result);
+
+		$result = $TestModel->Comment->Attachment->findById($TestModel->Comment->Attachment->id);
+		$expected = array(
+			'Attachment' => array(
+				'id' => '2',
+				'comment_id' => '11',
+				'attachment' => 'deepsave insert',
+			),
+			'Comment' => array(
+				'id' => '11',
+				'article_id' => '0',
+				'user_id' => '4',
+				'comment' => 'First comment deepsave insert',
+				'published' => 'Y',
+			)
+		);
+		unset($result['Attachment']['created'], $result['Attachment']['updated']);
+		$this->assertEquals($expected['Attachment'], $result['Attachment']);
+
+		unset($result['Comment']['created'], $result['Comment']['updated']);
+		$this->assertEquals($expected['Comment'], $result['Comment']);
+	}
+
+/**
+ * testSaveAllNotDeepMany
+ * tests the save methods to not save deeper recursive data
+ *
+ * @return void
+ */
+	public function testSaveAllNotDeepMany() {
+		$this->loadFixtures('Article', 'Comment', 'User', 'Attachment');
+		$TestModel = new Article();
+		$TestModel->hasMany['Comment']['order'] = array('Comment.created' => 'ASC');
+		$TestModel->hasAndBelongsToMany = array();
+
+		$data = array(
+			array(
+				'id' => 1, 'body' => '',
+				'Comment' => array(
+					array('comment' => '', 'published' => 'Y', 'User' => array('user' => '', 'password' => 'manysaved')),
+					array('comment' => 'Second comment deepsaved article 1', 'published' => 'Y', 'user_id' => 2)
+				)
+			),
+			array(
+				'Article' => array('id' => 2),
+				'Comment' => array(
+					array('comment' => 'First comment deepsaved article 2', 'published' => 'Y', 'User' => array('user' => 'savemore', 'password' => '')),
+					array('comment' => '', 'published' => 'Y', 'user_id' => 2)
+				)
+			)
+		);
+		$TestModel->Comment->validate['comment'] = 'notEmpty';
+		$result = $TestModel->saveAll($data, array('deep' => false));
+		$this->assertFalse($result);
+
+		$expected = array(
+			0 => array(
+				'body' => array('This field cannot be left blank')
+			)
+		);
+		$result = $TestModel->validationErrors;
+		$this->assertSame($expected, $result);
+
+		$data = array(
+			array(
+				'Article' => array('id' => 1, 'body' => 'Ignore invalid comment'),
+				'Comment' => array(
+					array('comment' => '', 'published' => 'Y', 'user_id' => 2)
+				)
+			),
+			array(
+				'Article' => array('id' => 2, 'body' => 'Same here'),
+				'Comment' => array(
+					array('comment' => '', 'published' => 'Y', 'user_id' => 2)
+				)
+			)
+		);
+		$result = $TestModel->saveAll($data, array('deep' => false));
+		$this->assertTrue($result);
+	}
+/**
+ * testSaveAllNotDeepValidateOnly
+ * tests the validate methods to not validate deeper recursive data
+ *
+ * @return void
+ */
+	public function testSaveAllNotDeepValidateOnly() {
+		$this->loadFixtures('Article', 'Comment', 'User', 'Attachment');
+		$TestModel = new Article();
+		$TestModel->hasMany['Comment']['order'] = array('Comment.created' => 'ASC');
+		$TestModel->hasAndBelongsToMany = array();
+		$TestModel->Comment->Attachment->validate['attachment'] = 'notEmpty';
+		$TestModel->Comment->validate['comment'] = 'notEmpty';
+
+		$result = $TestModel->saveAll(
+			array(
+				'Article' => array('id' => 2, 'body' => ''),
+				'Comment' => array(
+					array('comment' => 'First new comment', 'published' => 'Y', 'User' => array('user' => '', 'password' => 'newuserpass')),
+					array('comment' => 'Second new comment', 'published' => 'Y', 'user_id' => 2)
+				)
+			),
+			array('validate' => 'only', 'deep' => false)
+		);
+		$this->assertFalse($result);
+
+		$expected = array('body' => array('This field cannot be left blank'));
+		$result = $TestModel->validationErrors;
+		$this->assertSame($expected, $result);
+
+		$result = $TestModel->saveAll(
+			array(
+				'Article' => array('id' => 2, 'body' => 'Ignore invalid user data'),
+				'Comment' => array(
+					array('comment' => 'First new comment', 'published' => 'Y', 'User' => array('user' => '', 'password' => 'newuserpass')),
+					array('comment' => 'Second new comment', 'published' => 'Y', 'user_id' => 2)
+				)
+			),
+			array('validate' => 'only', 'deep' => false)
+		);
+		$this->assertTrue($result);
+
+		$result = $TestModel->saveAll(
+			array(
+				'Article' => array('id' => 2, 'body' => 'Ignore invalid user data'),
+				'Comment' => array(
+					array('comment' => 'First new comment', 'published' => 'Y', 'User' => array('user' => '', 'password' => 'newuserpass')),
+					array('comment' => 'Second new comment', 'published' => 'Y', 'user_id' => 2)
+				)
+			),
+			array('validate' => 'only', 'atomic' => false, 'deep' => false)
+		);
+		$expected = array(
+			'Article' => true,
+			'Comment' => array(
+                true,
+                true
+			)
+		);
+		$this->assertSame($expected, $result);
+
+		$result = $TestModel->saveAll(array(
+			'Article' => array('id' => 2, 'body' => 'Ignore invalid attachment data'),
+			'Comment' => array(
+				array('comment' => 'Third new comment', 'published' => 'Y', 'user_id' => 5),
+				array('comment' => 'Fourth new comment', 'published' => 'Y', 'user_id' => 2, 'Attachment' => array('attachment' => ''))
+			)
+		),
+		array('validate' => 'only', 'deep' => false)
+		);
+		$this->assertTrue($result);
+
+		$result = $TestModel->saveAll(array(
+			'Article' => array('id' => 2, 'body' => 'Ignore invalid attachment data'),
+			'Comment' => array(
+				array('comment' => 'Third new comment', 'published' => 'Y', 'user_id' => 5),
+				array('comment' => 'Fourth new comment', 'published' => 'Y', 'user_id' => 2, 'Attachment' => array('attachment' => ''))
+			)
+		),
+		array('validate' => 'only', 'atomic' => false, 'deep' => false)
+		);
+		$expected = array(
+			'Article' => true,
+			'Comment' => array(
+                true,
+                true
+			)
+		);
+		$this->assertSame($expected, $result);
+
+		$expected = array();
+		$result = $TestModel->validationErrors;
+		$this->assertSame($expected, $result);
+
+		$data = array(
+			'Attachment' => array(
+				'attachment' => 'deepsave insert',
+			),
+			'Comment' => array(
+				'comment' => 'First comment deepsave insert',
+				'published' => 'Y',
+				'user_id' => 5,
+				'Article' => array(
+					'title' => 'First Article deepsave insert ignored',
+					'body' => 'First Article Body deepsave insert',
+					'User' => array(
+						'user' => '',
+						'password' => 'magic'
+					),
+				),
+			)
+		);
+
+		$result = $TestModel->Comment->Attachment->saveAll($data, array('validate' => 'only', 'deep' => false));
+		$this->assertTrue($result);
+
+		$result = $TestModel->Comment->Attachment->validationErrors;
+		$expected = array();
+		$this->assertSame($expected, $result);
+
+		$result = $TestModel->Comment->Attachment->saveAll($data, array('validate' => 'only', 'atomic' => false, 'deep' => false));
+		$expected = array(
+			'Attachment' => true,
+			'Comment' => true
+		);
+		$this->assertEquals($expected, $result);
+
+		$data['Comment']['Article']['body'] = '';
+		$result = $TestModel->Comment->Attachment->saveAll($data, array('validate' => 'only', 'deep' => false));
+		$this->assertTrue($result);
+
+		$result = $TestModel->Comment->Attachment->validationErrors;
+		$expected = array();
+		$this->assertSame($expected, $result);
+
+		$result = $TestModel->Comment->Attachment->saveAll($data, array('validate' => 'only', 'atomic' => false, 'deep' => false));
+		$expected = array(
+			'Attachment' => true,
+			'Comment' => true
 		);
 		$this->assertEquals($expected, $result);
 	}

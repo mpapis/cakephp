@@ -2014,7 +2014,7 @@ class Model extends Object implements CakeEventListener {
 			$data = $this->data;
 		}
 
-		$options = array_merge(array('validate' => 'first', 'atomic' => true), $options);
+		$options = array_merge(array('validate' => 'first', 'atomic' => true, 'deep' => false), $options);
 		$this->validationErrors = $validationErrors = array();
 
 		if (empty($data) && $options['validate'] !== false) {
@@ -2038,7 +2038,11 @@ class Model extends Object implements CakeEventListener {
 			$validates = $this->create(null) !== null;
 			$saved = false;
 			if ($validates) {
-				$saved = $this->saveAssociated($record, array_merge($options, array('atomic' => false)));
+				if ($options['deep']) {
+					$saved = $this->saveAssociated($record, array_merge($options, array('atomic' => false)));
+				} else {
+					$saved = $this->save($record, $options);
+				}
 			}
 			$validates = ($validates && ($saved === true || (is_array($saved) && !in_array(false, $saved, true))));
 			if (!$validates) {
@@ -2082,10 +2086,14 @@ class Model extends Object implements CakeEventListener {
  *    depending on whether each record validated successfully.
  */
 	public function validateMany($data, $options = array()) {
-		$options = array_merge(array('atomic' => true), $options);
+		$options = array_merge(array('atomic' => true, 'deep' => false), $options);
 		$this->validationErrors = $validationErrors = $return = array();
 		foreach ($data as $key => $record) {
-			$validates = $this->validateAssociated($record, $options);
+			if ($options['deep']) {
+				$validates = $this->validateAssociated($record, $options);
+			} else {
+				$validates = $this->create($record) && $this->validates($options);
+			}
 			if ($validates === false || (is_array($validates) && in_array(false, $validates, true))) {
 				$validationErrors[$key] = $this->validationErrors;
 				$validates = false;
@@ -2127,7 +2135,7 @@ class Model extends Object implements CakeEventListener {
 			$data = $this->data;
 		}
 
-		$options = array_merge(array('validate' => 'first', 'atomic' => true), $options);
+		$options = array_merge(array('validate' => 'first', 'atomic' => true, 'deep' => false), $options);
 		$this->validationErrors = $validationErrors = array();
 
 		if (empty($data) && $options['validate'] !== false) {
@@ -2153,7 +2161,11 @@ class Model extends Object implements CakeEventListener {
 				$validates = $this->{$association}->create(null) !== null;
 				$saved = false;
 				if ($validates) {
-					$saved = $this->{$association}->saveAssociated($values, array_merge($options, array('atomic' => false)));
+					if ($options['deep']) {
+						$saved = $this->{$association}->saveAssociated($values, array_merge($options, array('atomic' => false)));
+					} else {
+						$saved = $this->{$association}->save($values, array_merge($options, array('atomic' => false)));
+					}
 					$validates = ($saved === true || (is_array($saved) && !in_array(false, $saved, true)));
 				}
 				if ($validates) {
@@ -2186,7 +2198,11 @@ class Model extends Object implements CakeEventListener {
 						$validates = $this->{$association}->create(null) !== null;
 						$saved = false;
 						if ($validates) {
-							$saved = $this->{$association}->saveAssociated($values, array_merge($options, array('atomic' => false)));
+							if ($options['deep']) {
+								$saved = $this->{$association}->saveAssociated($values, array_merge($options, array('atomic' => false)));
+							} else {
+								$saved = $this->{$association}->save($values, $options);
+							}
 						}
 						$validates = ($validates && ($saved === true || (is_array($saved) && !in_array(false, $saved, true))));
 						if (!$validates) {
@@ -2243,7 +2259,7 @@ class Model extends Object implements CakeEventListener {
  *    depending on whether each record validated successfully.
  */
 	public function validateAssociated($data, $options = array()) {
-		$options = array_merge(array('atomic' => true), $options);
+		$options = array_merge(array('atomic' => true, 'deep' => false), $options);
 		$this->validationErrors = $validationErrors = $return = array();
 		if (!($this->create($data) && $this->validates($options))) {
 			$validationErrors[$this->alias] = $this->validationErrors;
@@ -2256,7 +2272,11 @@ class Model extends Object implements CakeEventListener {
 			$validates = true;
 			if (isset($associations[$association])) {
 				if (in_array($associations[$association], array('belongsTo', 'hasOne'))) {
-					$validates = $this->{$association}->validateAssociated($values, $options);
+					if ($options['deep']) {
+						$validates = $this->{$association}->validateAssociated($values, $options);
+					} else {
+						$validates = $this->{$association}->create($values) !== null && $this->{$association}->validates($options);
+					}
 					if (is_array($validates)) {
 						if (in_array(false, $validates, true)) {
 							$validates = false;
