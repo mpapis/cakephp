@@ -403,7 +403,6 @@ class ViewTest extends CakeTestCase {
 		$expected = array(
 			CAKE . 'Test' . DS . 'test_app' . DS . 'View' . DS . 'Plugin' . DS . 'TestPlugin' . DS,
 			$pluginPath . 'View' . DS,
-			$pluginPath . 'Lib' . DS . 'View' . DS,
 			CAKE . 'Test' . DS . 'test_app' . DS . 'View' . DS,
 			CAKE . 'View' . DS
 		);
@@ -727,7 +726,7 @@ class ViewTest extends CakeTestCase {
 			'path' => CACHE . 'views' . DS,
 			'prefix' => ''
 		));
-		Cache::clear('test_view');
+		Cache::clear(false, 'test_view');
 
 		$View = new TestView($this->PostsController);
 		$View->elementCache = 'test_view';
@@ -764,6 +763,7 @@ class ViewTest extends CakeTestCase {
 		$result = Cache::read('element__test_element_cache_param_foo', 'test_view');
 		$this->assertEquals($expected, $result);
 
+		Cache::clear(false, 'test_view');
 		Cache::drop('test_view');
 	}
 
@@ -1392,7 +1392,6 @@ TEXT;
 		$this->View->render('extend_loop');
 	}
 
-
 /**
  * Test extend() in an element and a view.
  *
@@ -1409,6 +1408,17 @@ Element content.
 
 TEXT;
 		$this->assertEquals($expected, $content);
+	}
+
+/**
+ * Extending an element which doesn't exist should throw a missing view exception
+ *
+ * @expectedException LogicException
+ * @return void
+ */
+	public function testExtendMissingElement() {
+		$this->View->layout = false;
+		$this->View->render('extend_missing_element');
 	}
 
 /**

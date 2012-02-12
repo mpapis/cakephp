@@ -686,6 +686,9 @@ class CakeEmail {
 			if ($email === $alias) {
 				$return[] = $email;
 			} else {
+				if (strpos($alias, ',') !== false) {
+					$alias = '"' . $alias . '"';
+				}
 				$return[] = sprintf('%s <%s>', $this->_encode($alias), $email);
 			}
 		}

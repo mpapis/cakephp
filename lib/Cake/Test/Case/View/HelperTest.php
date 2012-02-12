@@ -198,6 +198,10 @@ class HelperTest extends CakeTestCase {
 		ClassRegistry::addObject('HelperTestPost', new HelperTestPost());
 		ClassRegistry::addObject('HelperTestComment', new HelperTestComment());
 		ClassRegistry::addObject('HelperTestTag', new HelperTestTag());
+
+		App::build(array(
+			'plugins' => array(CAKE . 'Test' . DS . 'test_app' . DS . 'Plugin' . DS),
+		));
 	}
 
 /**
@@ -590,6 +594,51 @@ class HelperTest extends CakeTestCase {
 	}
 
 /**
+ * test assetUrl application
+ *
+ * @return void
+ */
+	public function testAssetUrl() {
+		$this->Helper->webroot = '';
+		$_timestamp = Configure::read('Asset.timestamp');
+
+		$result = $this->Helper->assetUrl(array(
+				'controller' => 'js',
+				'action' => 'post',
+				'ext' => 'js'
+			),
+			array('fullBase' => true)
+		);
+		$this->assertEquals(FULL_BASE_URL . '/js/post.js', $result);
+
+		$result = $this->Helper->assetUrl('foo.jpg', array('pathPrefix' => 'img/'));
+		$this->assertEquals('img/foo.jpg', $result);
+
+		$result = $this->Helper->assetUrl('foo.jpg', array('fullBase' => true));
+		$this->assertEquals(FULL_BASE_URL . '/foo.jpg', $result);
+
+		$result = $this->Helper->assetUrl('style', array('ext' => '.css'));
+		$this->assertEqual('style.css', $result);
+
+		CakePlugin::load('TestPlugin');
+
+		$result = $this->Helper->assetUrl('TestPlugin.style', array('ext' => '.css'));
+		$this->assertEqual('test_plugin/style.css', $result);
+
+		$result = $this->Helper->assetUrl('TestPlugin.style', array('ext' => '.css', 'plugin' => false));
+		$this->assertEqual('TestPlugin.style.css', $result);
+
+		CakePlugin::unload('TestPlugin');
+
+		Configure::write('Asset.timestamp', 'force');
+
+		$result = $this->Helper->assetUrl('cake.generic.css', array('pathPrefix' => CSS_URL));
+		$this->assertRegExp('/' . preg_quote(CSS_URL . 'cake.generic.css?', '/') . '[0-9]+/', $result);
+
+		Configure::write('Asset.timestamp', $_timestamp);
+	}
+
+/**
  * test assetTimestamp with plugins and themes
  *
  * @return void
@@ -598,7 +647,6 @@ class HelperTest extends CakeTestCase {
 		$_timestamp = Configure::read('Asset.timestamp');
 		Configure::write('Asset.timestamp', 'force');
 		App::build(array(
-			'plugins' => array(CAKE . 'Test' . DS . 'test_app' . DS . 'Plugin' . DS),
 			'View' => array(CAKE . 'Test' . DS . 'test_app' . DS . 'View' . DS),
 		));
 		CakePlugin::loadAll();
