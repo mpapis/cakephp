@@ -1565,7 +1565,8 @@ class Model extends Object implements CakeEventListener {
  * @param mixed $validate Either a boolean, or an array.
  *   If a boolean, indicates whether or not to validate before saving.
  *   If an array, allows control of validate, callbacks, and fieldList
- * @param array $fieldList List of fields to allow to be written
+ * @param array $fieldList List of fields to allow to be written.
+ *   Array of fields, or array of Model aliasses with arrays of fields for associated model fieldLists
  * @return mixed On success Model::$data if its not empty or true, false on failure
  * @link http://book.cakephp.org/2.0/en/models/saving-your-data.html
  */
