@@ -6281,11 +6281,11 @@ class ModelWriteTest extends BaseModelTest {
 	}
 
 /**
- * validateSaveAllFieldListBelongsTo
+ * testSaveAllFieldListValidateBelongsTo
  *
  * @return void
  */
-	public function validateSaveAllFieldListBelongsTo() {
+	public function testSaveAllFieldListValidateBelongsTo() {
 		$this->loadFixtures('Post', 'Author', 'Comment', 'Attachment');
 		$TestModel = new Post();
 
@@ -6312,8 +6312,7 @@ class ModelWriteTest extends BaseModelTest {
 
 		$result = $TestModel->find('all');
 		$expected = array(
-			'Post' =>
-			array (
+			'Post' => array (
 				'id' => '4',
 				'author_id' => '5',
 				'title' => 'Post without body',
@@ -6322,8 +6321,7 @@ class ModelWriteTest extends BaseModelTest {
 				'created' => $ts,
 				'updated' => $ts,
 			),
-			'Author' =>
-			array (
+			'Author' => array (
 				'id' => '5',
 				'user' => 'bob',
 				'password' => NULL,
@@ -6450,6 +6448,94 @@ class ModelWriteTest extends BaseModelTest {
 		));
 		$this->assertTrue($result);
 		$this->assertEmpty($TestModel->validationErrors);
+	}
+
+/**
+ * testSaveAllDeepFieldListValidateBelongsTo
+ *
+ * @return void
+ */
+	public function testSaveAllDeepFieldListValidateBelongsTo() {
+		$this->loadFixtures('Post', 'Author', 'Comment', 'Attachment', 'Article', 'User');
+		$TestModel = new Post();
+		$TestModel->Author->bindModel(array('hasMany' => array('Comment' => array('foreignKey' => 'user_id'))), false);
+		$TestModel->recursive = 2;
+
+		$result = $TestModel->find('all');
+		$this->assertCount(3, $result);
+		$this->assertFalse(isset($result[3]));
+		$ts = date('Y-m-d H:i:s');
+
+		// test belongsTo
+		$fieldList = array(
+			'Post' => array('title', 'author_id'),
+			'Author' => array('user'),
+			'Comment' => array('comment')
+		);
+		$TestModel->saveAll(array(
+			'Post' => array(
+				'title' => 'Post without body',
+				'body' => 'This will not be saved',
+			),
+			'Author' => array(
+				'user' => 'bob',
+				'test' => 'This will not be saved',
+				'Comment' => array(
+					array('id' => 5, 'comment' => 'I am still published', 'published' => 'N'))
+
+		)), array('fieldList' => $fieldList, 'deep' => true));
+
+		$result = $TestModel->Author->Comment->find('first', array(
+			'conditions' => array('Comment.id' => 5),
+			'fields' => array('comment', 'published')
+		));
+		$expected = array(
+			'Comment' => array(
+				'comment' => 'I am still published',
+				'published' => 'Y'
+			)
+		);
+		$this->assertEquals($expected, $result);
+	}
+
+/**
+ * testSaveAllDeepFieldListHasMany method
+ *
+ * return @void
+ */
+	public function testSaveAllDeepFieldListHasMany() {
+		$this->loadFixtures('Article', 'Comment', 'User');
+		$TestModel = new Article();
+		$TestModel->belongsTo = $TestModel->hasAndBelongsToMany = array();
+
+		$this->db->truncate($TestModel);
+		$this->db->truncate(new Comment());
+
+		$fieldList = array(
+			'Article' => array('id'),
+			'Comment' => array('article_id', 'user_id'),
+			'User' => array('user')
+		);
+
+		$result = $TestModel->saveAll(array(
+			'Article' => array('id' => 2, 'title' => 'I will not save'),
+			'Comment' => array(
+				array('comment' => 'First new comment', 'published' => 'Y', 'user_id' => 1),
+				array('comment' => 'Second new comment', 'published' => 'Y', 'user_id' => 2, 'User' => array('user' => 'nopassword', 'password' => 'not saved'))
+			)
+		), array('fieldList' => $fieldList, 'deep' => true));
+
+		$result = $TestModel->Comment->User->find('first', array(
+			'conditions' => array('User.user' => 'nopassword'),
+			'fields' => array('user', 'password')
+		));
+		$expected = array(
+			'User' => array(
+				'user' => 'nopassword',
+				'password' => ''
+			)
+		);
+		$this->assertEquals($expected, $result);
 	}
 
 }
