@@ -1974,6 +1974,7 @@ class Model extends Object implements CakeEventListener {
  *       'AssociatedModel' => array('field', 'otherfield')
  *   )
  *   }}}
+ * - deep: see saveMany/saveAssociated
  *
  * @param array $data Record data to save. This can be either a numerically-indexed array (for saving multiple
  *     records of the same type), or an array indexed by association name.
@@ -2008,6 +2009,7 @@ class Model extends Object implements CakeEventListener {
  * - atomic: If true (default), will attempt to save all records in a single transaction.
  *   Should be set to false if database/table does not support transactions.
  * - fieldList: Equivalent to the $fieldList parameter in Model::save()
+ * - deep: If set to true, all associated data will be saved as well.
  *
  * @param array $data Record data to save. This should be a numerically-indexed array
  * @param array $options Options to use when saving record data, See $options above.
@@ -2084,6 +2086,7 @@ class Model extends Object implements CakeEventListener {
  *
  * - atomic: If true (default), returns boolean. If false returns array.
  * - fieldList: Equivalent to the $fieldList parameter in Model::save()
+ * - deep: If set to true, all associated data will be validated as well.
  *
  * @param array $data Record data to validate. This should be a numerically-indexed array
  * @param array $options Options to use when validating record data (see above), See also $options of validates().
@@ -2136,6 +2139,7 @@ class Model extends Object implements CakeEventListener {
  *       'AssociatedModel' => array('field', 'otherfield')
  *   )
  *   }}}
+ * - deep: If set to true, not only directly associated data is saved, but deeper nested associated data as well.
  *
  * @param array $data Record data to save. This should be an array indexed by association name.
  * @param array $options Options to use when saving record data, See $options above.
@@ -2265,6 +2269,7 @@ class Model extends Object implements CakeEventListener {
  *
  * - atomic: If true (default), returns boolean. If false returns array.
  * - fieldList: Equivalent to the $fieldList parameter in Model::save()
+ * - deep: If set to true, not only directly associated data , but deeper nested associated data is validated as well.
  *
  * @param array $data Record data to validate. This should be an array indexed by association name.
  * @param array $options Options to use when validating record data (see above), See also $options of validates().
