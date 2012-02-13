@@ -376,15 +376,9 @@ class AuthComponent extends Component {
 			$this->constructAuthorize();
 		}
 		foreach ($this->_authorizeObjects as $authorizer) {
-			try {
-				$authorized = $authorizer->authorize($user, $request);
-				if ($authorized === true) {
-					return true;
-				}
-			} catch (CakeException $e) {}
-		}
-		if (isset($e)) {
-			throw new CakeException($e->getMessage());
+			if ($authorizer->authorize($user, $request) === true) {
+				return true;
+			}
 		}
 		return false;
 	}
