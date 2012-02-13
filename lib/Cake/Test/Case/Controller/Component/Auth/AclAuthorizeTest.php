@@ -64,9 +64,9 @@ class AclAuthorizeTest extends CakeTestCase {
 	}
 
 /**
- * test authorize() without a mapped action, ensure an error is generated.
+ * test authorize() without a mapped action, ensure an exception is thrown.
  *
- * @expectedException PHPUnit_Framework_Error
+ * @expectedException CakeException
  * @return void
  */
 	public function testAuthorizeNoMappedAction() {
