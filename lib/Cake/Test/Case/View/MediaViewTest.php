@@ -105,7 +105,7 @@ class MediaViewTest extends CakeTestCase {
 		ob_start();
 		$result = $this->MediaView->render();
 		$output = ob_get_clean();
-		$this->assertEqual('this is the test asset css file', $output);
+		$this->assertEquals('this is the test asset css file', $output);
 		$this->assertTrue($result !== false);
 	}
 
@@ -161,7 +161,7 @@ class MediaViewTest extends CakeTestCase {
 		ob_start();
 		$result = $this->MediaView->render();
 		$output = ob_get_clean();
-		$this->assertEqual("some_key = some_value\nbool_key = 1\n", $output);
+		$this->assertEquals("some_key = some_value\nbool_key = 1\n", $output);
 		$this->assertTrue($result !== false);
 		if ($currentUserAgent !== null) {
 			$_SERVER['HTTP_USER_AGENT'] = $currentUserAgent;
@@ -225,7 +225,7 @@ class MediaViewTest extends CakeTestCase {
 		ob_start();
 		$result = $this->MediaView->render();
 		$output = ob_get_clean();
-		$this->assertEqual("some_key = some_value\nbool_key = 1\n", $output);
+		$this->assertEquals("some_key = some_value\nbool_key = 1\n", $output);
 		$this->assertTrue($result !== false);
 		if ($currentUserAgent !== null) {
 			$_SERVER['HTTP_USER_AGENT'] = $currentUserAgent;
@@ -244,6 +244,7 @@ class MediaViewTest extends CakeTestCase {
 			'path' =>  CAKE . 'Test' . DS . 'test_app' . DS . 'Config' . DS,
 			'id' => 'no_section.ini',
 			'extension' => 'ini',
+			'name' => 'config'
 		);
 		$this->MediaView->expects($this->exactly(2))
 			->method('_isActive')
@@ -270,7 +271,7 @@ class MediaViewTest extends CakeTestCase {
 
 		$this->MediaView->response->expects($this->once())
 			->method('download')
-			->with('no_section.ini');
+			->with('config.ini');
 
 		$this->MediaView->response->expects($this->at(4))
 			->method('header')
@@ -289,7 +290,7 @@ class MediaViewTest extends CakeTestCase {
 		ob_start();
 		$result = $this->MediaView->render();
 		$output = ob_get_clean();
-		$this->assertEqual("some_key = some_value\nbool_key = 1\n", $output);
+		$this->assertEquals("some_key = some_value\nbool_key = 1\n", $output);
 		$this->assertTrue($result !== false);
 		if ($currentUserAgent !== null) {
 			$_SERVER['HTTP_USER_AGENT'] = $currentUserAgent;
@@ -357,11 +358,34 @@ class MediaViewTest extends CakeTestCase {
  *
  * @return void
  */
-	function testRenderUpperExtesnion() {
+	public function testRenderUpperExtension() {
 		$this->MediaView->viewVars = array(
 			'path' =>  CAKE . 'Test' . DS . 'test_app' . DS . 'Vendor' . DS .'img' . DS,
 			'id' => 'test_2.JPG',
 			'extension' => 'JPG',
+		);
+
+		$this->MediaView->response->expects($this->any())
+			->method('type')
+			->with('jpg')
+			->will($this->returnArgument(0));
+
+		$this->MediaView->expects($this->at(0))
+			->method('_isActive')
+			->will($this->returnValue(true));
+
+		$this->MediaView->render();
+	}
+
+/**
+ * Test downloading files with extension not explicitly set.
+ *
+ * @return void
+ */
+	public function testRenderExtensionNotSet() {
+		$this->MediaView->viewVars = array(
+			'path' =>  CAKE . 'Test' . DS . 'test_app' . DS . 'Vendor' . DS .'img' . DS,
+			'id' => 'test_2.JPG',
 		);
 
 		$this->MediaView->response->expects($this->any())

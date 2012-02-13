@@ -16,14 +16,15 @@
  * @license       MIT License (http://www.opensource.org/licenses/mit-license.php)
  */
 
+App::uses('Shell', 'Console');
+
 /**
- * This is a placeholder class.
- * Create the same file in app/Console/Command/AppShell.php
+ * Application Shell
  *
  * Add your application-wide methods in the class below, your shells
  * will inherit them.
  *
- * @package       Cake.Console
+ * @package       app.Console.Command
  */
 class AppShell extends Shell {
 

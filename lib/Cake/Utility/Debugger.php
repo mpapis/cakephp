@@ -19,10 +19,6 @@
  * @license       MIT License (http://www.opensource.org/licenses/mit-license.php)
  */
 
-/**
- * Included libraries.
- *
- */
 App::uses('CakeLog', 'Log');
 App::uses('String', 'Utility');
 
@@ -245,6 +241,11 @@ class Debugger {
 				$error = 'Notice';
 				$level = LOG_NOTICE;
 			break;
+			case E_DEPRECATED:
+			case E_USER_DEPRECATED:
+				$error = 'Deprecated';
+				$level = LOG_NOTICE;
+			break;
 			default:
 				return;
 			break;
@@ -280,12 +281,12 @@ class Debugger {
 	public static function trace($options = array()) {
 		$_this = Debugger::getInstance();
 		$defaults = array(
-			'depth'   => 999,
-			'format'  => $_this->_outputFormat,
-			'args'    => false,
-			'start'   => 0,
-			'scope'   => null,
-			'exclude' => array('call_user_func_array', 'trigger_error')
+			'depth'		=> 999,
+			'format'	=> $_this->_outputFormat,
+			'args'		=> false,
+			'start'		=> 0,
+			'scope'		=> null,
+			'exclude'	=> array('call_user_func_array', 'trigger_error')
 		);
 		$options = Set::merge($defaults, $options);
 
@@ -406,7 +407,7 @@ class Debugger {
 			if (!isset($data[$i])) {
 				continue;
 			}
-			$string = str_replace(array("\r\n", "\n"), "", highlight_string($data[$i], true));
+			$string = str_replace(array("\r\n", "\n"), "", self::_highlight($data[$i]));
 			if ($i == $line) {
 				$lines[] = '<span class="code-highlight">' . $string . '</span>';
 			} else {
@@ -417,9 +418,26 @@ class Debugger {
 	}
 
 /**
+ * Wraps the highlight_string funciton in case the server API does not
+ * implement the function as it is the case of the HipHop interpreter
+ *
+ * @param string $str the string to convert
+ * @return string
+ */
+	protected static function _highlight($str) {
+		static $supportHighlight = null;
+		if (!$supportHighlight && function_exists('hphp_log')) {
+			$supportHighlight = false;
+			return htmlentities($str);
+		}
+		$supportHighlight = true;
+		return highlight_string($str, true);
+	}
+
+/**
  * Converts a variable to a string for debug output.
  *
- * *Note:* The following keys will have their contents 
+ * *Note:* The following keys will have their contents
  * replaced with `*****`:
  *
  *  - password
@@ -483,13 +501,23 @@ class Debugger {
 /**
  * Export an array type object.  Filters out keys used in datasource configuration.
  *
+ * The following keys are replaced with ***'s
+ *
+ * - password
+ * - login
+ * - host
+ * - database
+ * - port
+ * - prefix
+ * - schema
+ *
  * @param array $var The array to export.
  * @param integer $depth The current depth, used for recursion tracking.
  * @param integer $indent The current indentation level.
  * @return string Exported array.
  */
 	protected static function _array(array $var, $depth, $indent) {
-		$var = array_merge($var,  array_intersect_key(array(
+		$secrets = array(
 			'password' => '*****',
 			'login'  => '*****',
 			'host' => '*****',
@@ -497,7 +525,9 @@ class Debugger {
 			'port' => '*****',
 			'prefix' => '*****',
 			'schema' => '*****'
-		), $var));
+		);
+		$replace = array_intersect_key($secrets, $var);
+		$var = $replace + $var;
 
 		$out = "array(";
 		$n = $break = $end = null;
@@ -675,7 +705,10 @@ class Debugger {
 		$data += $defaults;
 
 		$files = $this->trace(array('start' => $data['start'], 'format' => 'points'));
-		$code = $this->excerpt($files[0]['file'], $files[0]['line'] - 1, 1);
+		$code = '';
+		if (isset($files[0]['file'])) {
+			$code = $this->excerpt($files[0]['file'], $files[0]['line'] - 1, 1);
+		}
 		$trace = $this->trace(array('start' => $data['start'], 'depth' => '20'));
 		$insertOpts = array('before' => '{:', 'after' => '}');
 		$context = array();
@@ -737,7 +770,7 @@ class Debugger {
  */
 	public static function getType($var) {
 		if (is_object($var)) {
-			return get_class($var); 
+			return get_class($var);
 		}
 		if (is_null($var)) {
 			return 'null';
@@ -777,5 +810,4 @@ class Debugger {
 			trigger_error(__d('cake_dev', 'Please change the value of \'Security.cipherSeed\' in app/Config/core.php to a numeric (digits only) seed value specific to your application'), E_USER_NOTICE);
 		}
 	}
-
 }

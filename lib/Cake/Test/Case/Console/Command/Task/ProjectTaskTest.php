@@ -35,7 +35,7 @@ App::uses('File', 'Utility');
 class ProjectTaskTest extends CakeTestCase {
 
 /**
- * setup method
+ * setUp method
  *
  * @return void
  */
@@ -52,7 +52,7 @@ class ProjectTaskTest extends CakeTestCase {
 	}
 
 /**
- * teardown method
+ * tearDown method
  *
  * @return void
  */
@@ -90,19 +90,39 @@ class ProjectTaskTest extends CakeTestCase {
 			'Config' . DS . 'Schema',
 			'Console',
 			'Console' . DS . 'Command',
+			'Console' . DS . 'Templates',
 			'Console' . DS . 'Command' . DS . 'Task',
 			'Controller',
+			'Controller' . DS. 'Component',
+			'Locale',
 			'Model',
-			'View',
-			'View' . DS . 'Helper',
+			'Model' . DS. 'Behavior',
+			'Model' . DS. 'Datasource',
+			'Plugin',
 			'Test',
 			'Test' . DS . 'Case',
+			'Test' . DS . 'Case' . DS . 'Controller',
+			'Test' . DS . 'Case' . DS . 'Controller' . DS . 'Component',
 			'Test' . DS . 'Case' . DS . 'Model',
+			'Test' . DS . 'Case' . DS . 'Model' . DS . 'Behavior',
 			'Test' . DS . 'Fixture',
+			'Vendor',
+			'View',
+			'View' . DS . 'Helper',
 			'tmp',
+			'tmp' . DS . 'cache',
+			'tmp' . DS . 'cache' . DS . 'models',
+			'tmp' . DS . 'cache' . DS . 'persistent',
+			'tmp' . DS . 'cache' . DS . 'views',
+			'tmp' . DS . 'logs',
+			'tmp' . DS . 'sessions',
+			'tmp' . DS . 'tests',
 			'webroot',
-			'webroot' . DS . 'js',
 			'webroot' . DS . 'css',
+			'webroot' . DS . 'files',
+			'webroot' . DS . 'img',
+			'webroot' . DS . 'js',
+			
 		);
 		foreach ($dirs as $dir) {
 			$this->assertTrue(is_dir($path . DS . $dir), 'Missing ' . $dir);
@@ -169,15 +189,26 @@ class ProjectTaskTest extends CakeTestCase {
 		$empty = array(
 			'Console' . DS . 'Command' . DS . 'Task' => 'empty',
 			'Controller' . DS . 'Component' => 'empty',
+			'Lib' => 'empty',
 			'Model' . DS . 'Behavior' => 'empty',
-			'View' . DS . 'Helper' => 'AppHelper.php',
-			'View' . DS . 'Errors' => 'empty',
-			'View' . DS . 'Scaffolds' => 'empty',
+			'Model' . DS . 'Datasource' => 'empty',
+			'Plugin' => 'empty',
 			'Test' . DS . 'Case' . DS . 'Model' . DS . 'Behavior' => 'empty',
 			'Test' . DS . 'Case' . DS . 'Controller' . DS . 'Component' => 'empty',
 			'Test' . DS . 'Case' . DS . 'View' . DS . 'Helper' => 'empty',
 			'Test' . DS . 'Fixture' => 'empty',
-			'webroot' . DS . 'js' => 'empty'
+			'Vendor' => 'empty',
+			'View' . DS . 'Elements' => 'empty',
+			'View' . DS . 'Errors' => 'empty',
+			'View' . DS . 'Scaffolds' => 'empty',
+			'tmp' . DS . 'cache' . DS . 'models' => 'empty',
+			'tmp' . DS . 'cache' . DS . 'persistent' => 'empty',
+			'tmp' . DS . 'cache' . DS . 'views' => 'empty',
+			'tmp' . DS . 'logs' => 'empty',
+			'tmp' . DS . 'sessions' => 'empty',
+			'tmp' . DS . 'tests' => 'empty',
+			'webroot' . DS . 'js' => 'empty',
+			'webroot' . DS . 'files' => 'empty'
 		);
 
 		foreach ($empty as $dir => $file) {
@@ -199,7 +230,7 @@ class ProjectTaskTest extends CakeTestCase {
 
 		$File = new File($path . 'Config' . DS . 'core.php');
 		$contents = $File->read();
-		$this->assertNoPattern('/DYhG93b0qyJfIxfs2guVoUubWwvniR2G0FgaC9mi/', $contents, 'Default Salt left behind. %s');
+		$this->assertNotRegExp('/DYhG93b0qyJfIxfs2guVoUubWwvniR2G0FgaC9mi/', $contents, 'Default Salt left behind. %s');
 	}
 
 /**
@@ -216,7 +247,7 @@ class ProjectTaskTest extends CakeTestCase {
 
 		$File = new File($path . 'Config' . DS . 'core.php');
 		$contents = $File->read();
-		$this->assertNoPattern('/76859309657453542496749683645/', $contents, 'Default CipherSeed left behind. %s');
+		$this->assertNotRegExp('/76859309657453542496749683645/', $contents, 'Default CipherSeed left behind. %s');
 	}
 
 /**
@@ -232,10 +263,10 @@ class ProjectTaskTest extends CakeTestCase {
 
 		$File = new File($path . 'webroot' . DS . 'index.php');
 		$contents = $File->read();
-		$this->assertNoPattern('/define\(\'CAKE_CORE_INCLUDE_PATH\', ROOT/', $contents);
+		$this->assertNotRegExp('/define\(\'CAKE_CORE_INCLUDE_PATH\', ROOT/', $contents);
 		$File = new File($path . 'webroot' . DS . 'test.php');
 		$contents = $File->read();
-		$this->assertNoPattern('/define\(\'CAKE_CORE_INCLUDE_PATH\', ROOT/', $contents);
+		$this->assertNotRegExp('/define\(\'CAKE_CORE_INCLUDE_PATH\', ROOT/', $contents);
 	}
 
 /**
@@ -246,7 +277,7 @@ class ProjectTaskTest extends CakeTestCase {
 	public function testGetPrefix() {
 		Configure::write('Routing.prefixes', array('admin'));
 		$result = $this->Task->getPrefix();
-		$this->assertEqual($result, 'admin_');
+		$this->assertEquals($result, 'admin_');
 
 		Configure::write('Routing.prefixes', null);
 		$this->_setupTestProject();
@@ -254,7 +285,7 @@ class ProjectTaskTest extends CakeTestCase {
 		$this->Task->expects($this->once())->method('in')->will($this->returnValue('super_duper_admin'));
 
 		$result = $this->Task->getPrefix();
-		$this->assertEqual($result, 'super_duper_admin_');
+		$this->assertEquals($result, 'super_duper_admin_');
 
 		$File = new File($this->Task->configPath . 'core.php');
 		$File->delete();
@@ -276,7 +307,7 @@ class ProjectTaskTest extends CakeTestCase {
 		$result = $this->Task->cakeAdmin('my_prefix');
 		$this->assertTrue($result);
 
-		$this->assertEqual(Configure::read('Routing.prefixes'), array('my_prefix'));
+		$this->assertEquals(Configure::read('Routing.prefixes'), array('my_prefix'));
 		$File->delete();
 	}
 
@@ -292,7 +323,7 @@ class ProjectTaskTest extends CakeTestCase {
 		$this->Task->expects($this->once())->method('in')->will($this->returnValue(2));
 
 		$result = $this->Task->getPrefix();
-		$this->assertEqual($result, 'ninja_');
+		$this->assertEquals($result, 'ninja_');
 	}
 
 /**
@@ -301,7 +332,7 @@ class ProjectTaskTest extends CakeTestCase {
  * @return void
  */
 	public function testExecute() {
-		$this->Task->params['skel'] = CAKE . 'Console' . DS. 'Templates' . DS . 'skel';
+		$this->Task->params['skel'] = CAKE . 'Console' . DS . 'Templates' . DS . 'skel';
 		$this->Task->params['working'] = TMP . 'tests' . DS;
 
 		$path = $this->Task->path . 'bake_test_app';
@@ -334,6 +365,6 @@ class ProjectTaskTest extends CakeTestCase {
 
 		$File = new File($path . 'Console' . DS . 'cake.php');
 		$contents = $File->read();
-		$this->assertNoPattern('/__CAKE_PATH__/', $contents, 'Console path placeholder left behind.');
+		$this->assertNotRegExp('/__CAKE_PATH__/', $contents, 'Console path placeholder left behind.');
 	}
 }
