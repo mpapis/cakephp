@@ -16,7 +16,8 @@
  * @since         CakePHP(tm) v 2.0
  * @license       MIT License (http://www.opensource.org/licenses/mit-license.php)
  */
-
+App::uses('ComponentCollection', 'Controller');
+App::uses('AclComponent', 'Controller/Component');
 App::uses('DbAcl', 'Controller/Component/Acl');
 App::uses('AclNode', 'Model');
 
