@@ -112,11 +112,15 @@ class AclAuthorize extends BaseAuthorize {
 
 	public function getAco($object, $id) {
 		if (!$object->Behaviors->attached('Acl')) {
-			return null;
+			return false;
 		}
 		$tmp = $object->id;
 		$object->id = $id;
-		$aco = $object->node(null, 'Aco');
+		try {
+			$aco = $object->node(null, 'Aco');
+		} catch (CakeException $e) {
+			return false;
+		}
 		$object->id = $tmp;
 		return $aco[0]['Aco'];
 	}
