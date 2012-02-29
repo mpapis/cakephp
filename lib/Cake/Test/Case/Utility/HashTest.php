@@ -329,6 +329,42 @@ class HashTest extends CakeTestCase {
 		);
 		$this->assertEquals($expected, $result);
 	}
+/**
+ * Test diff();
+ *
+ * @return void
+ */
+	public function testDiffExtra() {
+		$a = array(
+			0 => array('name' => 'main'),
+			1 => array('name' => 'about')
+		);
+		$b = array(
+			0 => array('name' => 'me'),
+			1 => array('name' => 'about'),
+			2 => array('name' => 'contact')
+		);
+
+		$result = Hash::diff($a, $b);
+		$expected = array(
+			0 => array('name' => 'me'),
+			2 => array('name' => 'contact')
+		);
+		$this->assertEquals($expected, $result);
+/*
+	Failed asserting that two arrays are equal.
+	--- Expected
+	+++ Actual
+	@@ @@
+	 Array (
+		 0 => Array (
+	-        'name' => 'me'
+	+        'name' => 'main'
+		 )
+		 2 => Array (...)
+	 )
+*/
+	}
 
 /**
  * Test diff();
@@ -453,7 +489,7 @@ class HashTest extends CakeTestCase {
 			'cakephp',
 			'ice-cream'
 		);
-		$result = Hash::merge($a, $b); 
+		$result = Hash::merge($a, $b);
 		$this->assertEquals($expected, $result);
 
 		$c = array(
@@ -659,7 +695,7 @@ class HashTest extends CakeTestCase {
 		$data = self::articleData();
 		$result = Hash::extract($data, '{n}.Article.title');
 		$expected = array(
-			'First Article', 'Second Article', 
+			'First Article', 'Second Article',
 			'Third Article', 'Fourth Article',
 			'Fifth Article'
 		);
@@ -728,7 +764,7 @@ class HashTest extends CakeTestCase {
 		$expected = array('John', 'Bob', 'Tony');
 		$this->assertEquals($expected, $result);
 	}
-	
+
 /**
  * Test the {s} selector.
  *
@@ -883,7 +919,7 @@ class HashTest extends CakeTestCase {
 			array('test5', 'test6')
 		);
 		$this->assertEquals($expected, Hash::extract($data, 'Level1.Level2bis'));
-		
+
 		$data['Level1']['Level2'] = array('test1', 'test2');
 		$this->assertEquals($expected, Hash::extract($data, 'Level1.Level2bis'));
 	}
