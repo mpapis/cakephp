@@ -239,6 +239,45 @@ class App {
 	}
 
 /**
+ * Return all possible paths to find view files in order
+ *
+ * @param string $plugin Optional plugin name to scan for view files.
+ * @param string $theme Optional theme name.
+ * @return array paths
+ */
+	public static function viewPaths($plugin = null, $theme = null) {
+		$paths = array();
+		$viewPaths = self::path('View');
+		$corePaths = array_merge(self::core('View'), self::core('Console/Templates/skel/View'));
+
+		if (!empty($plugin)) {
+			$count = count($viewPaths);
+			for ($i = 0; $i < $count; $i++) {
+				if (!in_array($viewPaths[$i], $corePaths)) {
+					$paths[] = $viewPaths[$i] . 'Plugin' . DS . $plugin . DS;
+				}
+			}
+			$paths = array_merge($paths, self::path('View', $plugin));
+		}
+
+		$paths = array_unique(array_merge($paths, $viewPaths));
+		if (!empty($theme)) {
+			$themePaths = array();
+			foreach ($paths as $path) {
+				if (strpos($path, DS . 'Plugin' . DS) === false) {
+					if ($plugin) {
+						$themePaths[] = $path . 'Themed' . DS . $theme . DS . 'Plugin' . DS . $plugin . DS;
+					}
+					$themePaths[] = $path . 'Themed' . DS . $theme . DS;
+				}
+			}
+			$paths = array_merge($themePaths, $paths);
+		}
+		$paths = array_merge($paths, $corePaths);
+		return $paths;
+	}
+
+/**
  * Get all the currently loaded paths from App. Useful for inspecting
  * or storing all paths App knows about.  For a paths to a specific package
  * use App::path()

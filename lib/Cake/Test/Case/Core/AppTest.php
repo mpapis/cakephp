@@ -470,6 +470,69 @@ class AppTest extends CakeTestCase {
 	}
 
 /**
+ * test that viewPaths can find paths.
+ *
+ * @return void
+ */
+	public function testViewPaths() {
+		App::build(array(
+			'View' => array(CAKE . 'Test' . DS . 'test_app' . DS . 'View' . DS)
+		));
+		$paths = App::viewPaths();
+		$expected = array(
+			ROOT . DS . 'lib' . DS . 'Cake' . DS . 'Test' . DS . 'test_app' . DS . 'View' . DS,
+			ROOT . DS . 'app' . DS . 'View' . DS,
+			ROOT . DS . 'lib' . DS . 'Cake' . DS . 'View' . DS,
+			ROOT . DS . 'lib' . DS . 'Cake' . DS . 'Console' . DS . 'Templates' . DS . 'skel' . DS . 'View' . DS
+		);
+		$this->assertEquals($expected, $paths);
+		$paths = App::viewPaths(null, 'TestTheme');
+		$expected = array(
+			ROOT . DS . 'lib' . DS . 'Cake' . DS . 'Test' . DS . 'test_app' . DS . 'View' . DS . 'Themed' . DS . 'TestTheme' . DS ,
+			ROOT . DS . 'app' . DS . 'View' . DS . 'Themed' . DS . 'TestTheme' . DS,
+			ROOT . DS . 'lib' . DS . 'Cake' . DS . 'Test' . DS . 'test_app' . DS . 'View' . DS,
+			ROOT . DS . 'app' . DS . 'View' . DS,
+			ROOT . DS . 'lib' . DS . 'Cake' . DS . 'View' . DS,
+			ROOT . DS . 'lib' . DS . 'Cake' . DS . 'Console' . DS . 'Templates' . DS . 'skel' . DS . 'View' . DS
+		);
+		$this->assertEquals($expected, $paths);
+
+		App::build(array(
+			'Plugin' => array(CAKE . 'Test' . DS . 'test_app' . DS . 'Plugin' . DS)
+		));
+		CakePlugin::load('TestPlugin');
+		$paths = App::viewPaths('TestPlugin');
+		$expected = array(
+			ROOT . DS . 'lib' . DS . 'Cake' . DS . 'Test' . DS . 'test_app' . DS . 'View' . DS . 'Plugin' . DS . 'TestPlugin' . DS,
+			ROOT . DS . 'app' . DS . 'View' . DS . 'Plugin' . DS . 'TestPlugin' . DS,
+			ROOT . DS . 'lib' . DS . 'Cake' . DS . 'Test' . DS . 'test_app' . DS . 'Plugin' . DS . 'TestPlugin' . DS . 'View' . DS,
+			ROOT . DS . 'lib' . DS . 'Cake' . DS . 'Test' . DS . 'test_app' . DS . 'View' . DS,
+			ROOT . DS . 'app' . DS . 'View' . DS,
+			ROOT . DS . 'lib' . DS . 'Cake' . DS . 'View' . DS,
+			ROOT . DS . 'lib' . DS . 'Cake' . DS . 'Console' . DS . 'Templates' . DS . 'skel' . DS . 'View' . DS
+		);
+		$this->assertEquals($expected, $paths);
+
+		$paths = App::viewPaths('TestPlugin', 'TestTheme');
+		$expected = array(
+			ROOT . DS . 'lib' . DS . 'Cake' . DS . 'Test' . DS . 'test_app' . DS . 'View' . DS . 'Themed' . DS . 'TestTheme' . DS . 'Plugin' . DS . 'TestPlugin' . DS,
+			ROOT . DS . 'lib' . DS . 'Cake' . DS . 'Test' . DS . 'test_app' . DS . 'View' . DS . 'Themed' . DS . 'TestTheme' . DS,
+			ROOT . DS . 'app' . DS . 'View' . DS . 'Themed' . DS . 'TestTheme' . DS . 'Plugin' . DS . 'TestPlugin' . DS,
+			ROOT . DS . 'app' . DS . 'View' . DS . 'Themed' . DS . 'TestTheme' . DS,
+			ROOT . DS . 'lib' . DS . 'Cake' . DS . 'Test' . DS . 'test_app' . DS . 'View' . DS . 'Plugin' . DS . 'TestPlugin' . DS,
+			ROOT . DS . 'app' . DS . 'View' . DS . 'Plugin' . DS . 'TestPlugin' . DS,
+			ROOT . DS . 'lib' . DS . 'Cake' . DS . 'Test' . DS . 'test_app' . DS . 'Plugin' . DS . 'TestPlugin' . DS . 'View' . DS,
+			ROOT . DS . 'lib' . DS . 'Cake' . DS . 'Test' . DS . 'test_app' . DS . 'View' . DS,
+			ROOT . DS . 'app' . DS . 'View' . DS,
+			ROOT . DS . 'lib' . DS . 'Cake' . DS . 'View' . DS,
+			ROOT . DS . 'lib' . DS . 'Cake' . DS . 'Console' . DS . 'Templates' . DS . 'skel' . DS . 'View' . DS
+		);
+		$this->assertEquals($expected, $paths);
+
+		App::build();
+	}
+
+/**
  * testClassLoading method
  *
  * @return void
