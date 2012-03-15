@@ -11,10 +11,9 @@ env:
   - DB=sqlite
 
 before_script:
-  - ulimit -n 4096
+  - ulimit -Hn 50000
+  - ulimit -Sn 50000
   - ulimit -a
-  - ulimit -Sn
-  - ulimit -Hn
   - sh -c "if [ '$DB' = 'mysql' ]; then mysql -e 'CREATE DATABASE cakephp_test;'; fi"
   - sh -c "if [ '$DB' = 'mysql' ]; then mysql -e 'CREATE DATABASE cakephp_test2;'; fi"
   - sh -c "if [ '$DB' = 'mysql' ]; then mysql -e 'CREATE DATABASE cakephp_test3;'; fi"
