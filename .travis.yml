@@ -14,7 +14,7 @@ before_script:
   - ulimit -Hn
   - ulimit -Sn
   - ulimit -a
-  - ulimit -n 50000
+  - ulimit -n 64000
   - sh -c "if [ '$DB' = 'mysql' ]; then mysql -e 'CREATE DATABASE cakephp_test;'; fi"
   - sh -c "if [ '$DB' = 'mysql' ]; then mysql -e 'CREATE DATABASE cakephp_test2;'; fi"
   - sh -c "if [ '$DB' = 'mysql' ]; then mysql -e 'CREATE DATABASE cakephp_test3;'; fi"
