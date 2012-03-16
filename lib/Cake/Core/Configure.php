@@ -81,10 +81,10 @@ class Configure {
 				$level = self::$_values['Error']['level'];
 			}
 			if (!empty(self::$_values['Error']['handler'])) {
-				set_error_handler(self::$_values['Error']['handler'], $level);
+				//set_error_handler(self::$_values['Error']['handler'], $level);
 			}
 			if (!empty(self::$_values['Exception']['handler'])) {
-				set_exception_handler(self::$_values['Exception']['handler']);
+				//set_exception_handler(self::$_values['Exception']['handler']);
 			}
 			if (!include APP . 'Config' . DS . 'bootstrap.php') {
 				trigger_error(__d('cake_dev', "Can't find application bootstrap file. Please create %sbootstrap.php, and make sure it is readable by PHP.", APP . 'Config' . DS), E_USER_ERROR);
