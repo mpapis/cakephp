@@ -10,7 +10,7 @@ env:
   - DB=pgsql
   - DB=sqlite
 
-after_install:
+before_script:
   - sh -c "if [ '$DB' = 'mysql' ]; then mysql -e 'CREATE DATABASE cakephp_test;'; fi"
   - sh -c "if [ '$DB' = 'mysql' ]; then mysql -e 'CREATE DATABASE cakephp_test2;'; fi"
   - sh -c "if [ '$DB' = 'mysql' ]; then mysql -e 'CREATE DATABASE cakephp_test3;'; fi"
@@ -23,6 +23,7 @@ after_install:
     server.listen(80, 'localhost');
     console.log('TCP server listening on port 80 at localhost.');" > app/tmp/socket.js
   - sudo node ./app/tmp/socket.js &
+  - chmod a+x travis_build.sh
   - set +H
   - echo "<?php
     class DATABASE_CONFIG {
@@ -103,9 +104,7 @@ after_install:
       }
     }
     }" > app/Config/database.php
-
-script: 
-  - chmod a+x travis_build.sh
+script:
   - sudo ./travis_build.sh
 
 notifications:
