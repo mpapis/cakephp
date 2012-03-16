@@ -80,6 +80,9 @@ class FileTest extends CakeTestCase {
 			'filesize' => filesize($file),
 			'mime' => 'text/x-php'
 		);
+		if (!function_exists('finfo_open') && !function_exists('mime_content_type')) {
+			$expected['mime'] = false;
+		}
 		$this->assertEquals($expecting, $result);
 
 		$result = $this->File->ext();

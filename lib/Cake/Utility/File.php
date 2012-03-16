@@ -555,7 +555,7 @@ class File {
  */
 	public function mime() {
 		if (!$this->exists()) {
-			return null;
+			return false;
 		}
 		if (function_exists('finfo_open')) {
 			$finfo = finfo_open(FILEINFO_MIME);
