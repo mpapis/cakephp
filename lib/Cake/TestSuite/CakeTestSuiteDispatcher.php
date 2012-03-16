@@ -228,7 +228,6 @@ class CakeTestSuiteDispatcher {
  * @return void
  */
 	protected function _runTestCase() {
-		echo $this->params['case'];
 		$commandArgs = array(
 			'case' => $this->params['case'],
 			'core' => $this->params['core'],
