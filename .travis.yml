@@ -105,7 +105,7 @@ after_install:
     }" > app/Config/database.php
 
 script:
-  - sudo ./travis_build.sh
+  - sudo .travis_build.sh
 
 notifications:
   email: false
