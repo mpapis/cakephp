@@ -548,14 +548,14 @@ class File {
 	}
 
 /**
- * Get the mime type of the file.  Uses the finfo extension if 
+ * Get the mime type of the file.  Uses the finfo extension if
  * its available, otherwise falls back to mime_content_type
  *
  * @return false|string The mimetype of the file, or false if reading fails.
  */
 	public function mime() {
 		if (!$this->exists()) {
-			return false;
+			return null;
 		}
 		if (function_exists('finfo_open')) {
 			$finfo = finfo_open(FILEINFO_MIME);
